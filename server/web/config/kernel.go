@@ -8,6 +8,9 @@ import (
 	"github.com/herhe-com/framework/database/orm"
 	"github.com/herhe-com/framework/database/redis"
 	"github.com/herhe-com/framework/facades"
+	"github.com/herhe-com/framework/filesystem"
+	"github.com/herhe-com/framework/microservice/locker"
+	"github.com/herhe-com/framework/microservice/snowflake"
 	"github.com/herhe-com/framework/validation"
 )
 
@@ -17,17 +20,14 @@ func init() {
 		"providers": []service.Provider{
 			&orm.ServiceProvider{},
 			&redis.ServiceProvider{},
-			//&filesystem.ServiceProvider{},
-			//&snowflake.ServiceProvider{},
-			//&locker.ServiceProvider{},
+			&filesystem.ServiceProvider{},
+			&snowflake.ServiceProvider{},
+			&locker.ServiceProvider{},
 			&validation.ServiceProvider{},
-			//&auth.ServiceProvider{},
 			&console.ServiceProvider{},
 		},
 		"consoles": []cons.Provider{
-			//&consoles.MigrationProvider{},
 			&consoles.ServerProvider{},
-			//&consoles2.RoleProvider{},
 		},
 	})
 }
