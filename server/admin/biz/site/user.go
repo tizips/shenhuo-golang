@@ -17,6 +17,17 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+// ToUserByPaginate
+// @Summary 获取用户列表
+// @Description Permissions: site.user.paginate
+// @Tags 站点-用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param page query int false "页码"
+// @Param size query int false "每页数量"
+// @Success 200 {object} response.Paginate[res.ToUserByPaginate] "用户列表"
+// @Router /site/users [get]
 func ToUserByPaginate(c context.Context, ctx *app.RequestContext) {
 
 	var request req.ToUserByPaginate
@@ -94,6 +105,16 @@ func ToUserByPaginate(c context.Context, ctx *app.RequestContext) {
 
 }
 
+// DoUserByCreate
+// @Summary 创建用户
+// @Description Permissions: site.user.create
+// @Tags 站点-用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body req.DoUserByCreate true "用户信息"
+// @Success 200 {object} nil "创建成功"
+// @Router /site/user [post]
 func DoUserByCreate(c context.Context, ctx *app.RequestContext) {
 
 	var request req.DoUserByCreate
@@ -176,6 +197,17 @@ func DoUserByCreate(c context.Context, ctx *app.RequestContext) {
 	http.Success[any](ctx)
 }
 
+// DoUserByUpdate
+// @Summary 更新用户
+// @Description Permissions: site.user.update
+// @Tags 站点-用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "用户ID"
+// @Param request body req.DoUserByUpdate true "用户信息"
+// @Success 200 {object} nil "更新成功"
+// @Router /site/users/{id} [put]
 func DoUserByUpdate(c context.Context, ctx *app.RequestContext) {
 
 	var request req.DoUserByUpdate
@@ -363,6 +395,16 @@ func DoUserByUpdate(c context.Context, ctx *app.RequestContext) {
 	http.Success[any](ctx)
 }
 
+// DoUserByDelete
+// @Summary 删除用户
+// @Description Permissions: site.user.delete
+// @Tags 站点-用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path string true "用户ID"
+// @Success 200 {object} nil "删除成功"
+// @Router /site/users/{id} [delete]
 func DoUserByDelete(c context.Context, ctx *app.RequestContext) {
 
 	id := ctx.Param("id")
@@ -410,6 +452,16 @@ func DoUserByDelete(c context.Context, ctx *app.RequestContext) {
 	http.Success[any](ctx)
 }
 
+// DoUserByEnable
+// @Summary 启用/禁用用户
+// @Description Permissions: site.user.enable
+// @Tags 站点-用户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body req.DoUserByEnable true "启用信息"
+// @Success 200 {object} nil "操作成功"
+// @Router /site/user/enable [put]
 func DoUserByEnable(c context.Context, ctx *app.RequestContext) {
 
 	var request req.DoUserByEnable

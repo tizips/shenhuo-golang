@@ -38,3 +38,6 @@ dumped_hertz_remote_config.json
 env.yaml
 
 /demo
+
+/server/admin/docs
+/server/web/docs

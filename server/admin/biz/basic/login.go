@@ -15,6 +15,15 @@ import (
 	"gorm.io/gorm"
 )
 
+// DoLoginOfAccount
+// @Summary 账号登录
+// @Description 管理员账号登录接口
+// @Tags 基础-登录
+// @Accept json
+// @Produce json
+// @Param request body req.DoLoginOfAccount true "登录信息"
+// @Success 200 {object} res.DoLogin "登录成功"
+// @Router /basic/login/account [post]
 func DoLoginOfAccount(c context.Context, ctx *app.RequestContext) {
 
 	var request req.DoLoginOfAccount
@@ -72,6 +81,15 @@ func DoLoginOfAccount(c context.Context, ctx *app.RequestContext) {
 	http.Success(ctx, responses)
 }
 
+// DoLoginOfOut
+// @Summary 退出登录
+// @Description 退出当前登录
+// @Tags 基础-账户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} nil "退出成功"
+// @Router /basic/account/logout [post]
 func DoLoginOfOut(c context.Context, ctx *app.RequestContext) {
 
 	if ok, _ := auth.BlacklistOfJwtValue(c, ctx); !ok {

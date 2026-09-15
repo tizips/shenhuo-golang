@@ -10,6 +10,17 @@ import (
 	"path/filepath"
 )
 
+// DoUploadOfFile
+// @Summary 上传文件
+// @Description 上传文件到指定目录
+// @Tags 基础-上传
+// @Accept multipart/form-data
+// @Produce json
+// @Security ApiKeyAuth
+// @Param file formData file true "文件"
+// @Param dir formData string true "目录"
+// @Success 200 {object} basic.DoUploadOfFile "上传结果"
+// @Router /basic/upload/file [post]
 func DoUploadOfFile(c context.Context, ctx *app.RequestContext) {
 
 	var request req.DoUploadOfFile

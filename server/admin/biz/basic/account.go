@@ -9,13 +9,22 @@ import (
 	"github.com/herhe-com/framework/auth"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/http"
+	"github.com/samber/lo"
 	"github.com/tizips/shenhuo/model"
 	req "github.com/tizips/shenhuo/server/admin/http/request/basic"
 	res "github.com/tizips/shenhuo/server/admin/http/response/basic"
-	"github.com/samber/lo"
 	"gorm.io/gorm"
 )
 
+// ToAccountOfInformation
+// @Summary 获取账户信息
+// @Description 获取当前登录用户的账户信息
+// @Tags 基础-账户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} res.ToAccountOfInformation "账户信息"
+// @Router /basic/account/information [get]
 func ToAccountOfInformation(c context.Context, ctx *app.RequestContext) {
 
 	var user model.SysUser
@@ -50,6 +59,15 @@ func ToAccountOfInformation(c context.Context, ctx *app.RequestContext) {
 	http.Success(ctx, responses)
 }
 
+// ToAccountOfModules
+// @Summary 获取模块列表
+// @Description 获取当前用户可访问的模块列表
+// @Tags 基础-账户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {array} res.ToAccountOfModules "模块列表"
+// @Router /basic/account/modules [get]
 func ToAccountOfModules(c context.Context, ctx *app.RequestContext) {
 
 	responses := make([]res.ToAccountOfModules, 0)
@@ -99,6 +117,16 @@ func ToAccountOfModules(c context.Context, ctx *app.RequestContext) {
 	http.Success(ctx, responses)
 }
 
+// ToAccountOfPermissions
+// @Summary 获取权限列表
+// @Description 获取当前用户在指定模块下的权限列表
+// @Tags 基础-账户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param module query string true "模块代码"
+// @Success 200 {array} string "权限列表"
+// @Router /basic/account/permissions [get]
 func ToAccountOfPermissions(c context.Context, ctx *app.RequestContext) {
 
 	var request req.ToAccountOfPermissions
@@ -142,6 +170,16 @@ func ToAccountOfPermissions(c context.Context, ctx *app.RequestContext) {
 	http.Success(ctx, responses)
 }
 
+// DoAccount
+// @Summary 更新账户信息
+// @Description 更新当前登录用户的账户信息
+// @Tags 基础-账户
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body req.DoAccount true "账户信息"
+// @Success 200 {object} nil "更新成功"
+// @Router /basic/account [put]
 func DoAccount(c context.Context, ctx *app.RequestContext) {
 
 	var request req.DoAccount

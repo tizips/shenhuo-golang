@@ -11,15 +11,26 @@ import (
 	"github.com/herhe-com/framework/database/orm/scope"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/http"
+	"github.com/samber/lo"
 	"github.com/tizips/shenhuo/model"
 	req "github.com/tizips/shenhuo/server/admin/http/request/site"
 	res "github.com/tizips/shenhuo/server/admin/http/response/site"
-	"github.com/samber/lo"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"strings"
 )
 
+// ToRoleByPaginate
+// @Summary 获取角色列表
+// @Description Permissions: site.role.paginate
+// @Tags 站点-角色
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param page query int false "页码"
+// @Param size query int false "每页数量"
+// @Success 200 {object} response.Paginate[res.ToRoleByPaginate] "角色列表"
+// @Router /site/roles [get]
 func ToRoleByPaginate(c context.Context, ctx *app.RequestContext) {
 
 	var request req.ToRoleByPaginate
@@ -64,6 +75,16 @@ func ToRoleByPaginate(c context.Context, ctx *app.RequestContext) {
 	http.Success(ctx, responses)
 }
 
+// ToRoleByInformation
+// @Summary 获取角色详情
+// @Description 获取指定角色详情
+// @Tags 站点-角色
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "角色ID"
+// @Success 200 {object} res.ToRoleByInformation "角色详情"
+// @Router /site/roles/{id} [get]
 func ToRoleByInformation(c context.Context, ctx *app.RequestContext) {
 
 	id := ctx.Param("id")
@@ -94,6 +115,16 @@ func ToRoleByInformation(c context.Context, ctx *app.RequestContext) {
 	http.Success(ctx, responses)
 }
 
+// DoRoleByCreate
+// @Summary 创建角色
+// @Description Permissions: site.role.create
+// @Tags 站点-角色
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body req.DoRoleByCreate true "角色信息"
+// @Success 200 {object} nil "创建成功"
+// @Router /site/role [post]
 func DoRoleByCreate(c context.Context, ctx *app.RequestContext) {
 
 	var request req.DoRoleByCreate
@@ -214,6 +245,17 @@ func DoRoleByCreate(c context.Context, ctx *app.RequestContext) {
 	http.Success[any](ctx)
 }
 
+// DoRoleByUpdate
+// @Summary 更新角色
+// @Description Permissions: site.role.update
+// @Tags 站点-角色
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "角色ID"
+// @Param request body req.DoRoleByUpdate true "角色信息"
+// @Success 200 {object} nil "更新成功"
+// @Router /site/roles/{id} [put]
 func DoRoleByUpdate(c context.Context, ctx *app.RequestContext) {
 
 	var request req.DoRoleByUpdate
@@ -392,6 +434,16 @@ func DoRoleByUpdate(c context.Context, ctx *app.RequestContext) {
 	http.Success[any](ctx)
 }
 
+// DoRoleByDelete
+// @Summary 删除角色
+// @Description Permissions: site.role.delete
+// @Tags 站点-角色
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "角色ID"
+// @Success 200 {object} nil "删除成功"
+// @Router /site/roles/{id} [delete]
 func DoRoleByDelete(c context.Context, ctx *app.RequestContext) {
 
 	id := ctx.Param("id")
@@ -432,6 +484,15 @@ func DoRoleByDelete(c context.Context, ctx *app.RequestContext) {
 	http.Success[any](ctx)
 }
 
+// ToRoleByOpening
+// @Summary 获取可用角色列表
+// @Description 获取所有可用的角色列表
+// @Tags 站点-角色
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {array} response.Opening[uint] "角色列表"
+// @Router /site/role/opening [get]
 func ToRoleByOpening(c context.Context, ctx *app.RequestContext) {
 
 	var roles []model.SysRole

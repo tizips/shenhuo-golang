@@ -7,6 +7,8 @@ import (
 
 	//Delayed startup of other services init
 	"github.com/tizips/shenhuo/server/admin/config"
+
+	_ "github.com/tizips/shenhuo/server/admin/docs"
 )
 
 func Boot() {

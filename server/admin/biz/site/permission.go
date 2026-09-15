@@ -12,6 +12,15 @@ import (
 	"github.com/tizips/shenhuo/model"
 )
 
+// ToPermissions
+// @Summary 获取权限树
+// @Description 获取当前用户可分配的权限树
+// @Tags 站点-权限
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {array} authConstants.Tree "权限树"
+// @Router /site/permissions [get]
 func ToPermissions(c context.Context, ctx *app.RequestContext) {
 
 	var responses []authConstants.Tree
