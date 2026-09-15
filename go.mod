@@ -5,6 +5,7 @@ go 1.26.0
 require (
 	github.com/cloudwego/hertz v0.10.6
 	github.com/go-playground/validator/v10 v10.30.3
+	github.com/go-redsync/redsync/v4 v4.17.0
 	github.com/golang-module/carbon/v2 v2.3.4
 	github.com/gookit/color v1.6.1
 	github.com/gookit/goutil v0.6.15
@@ -12,6 +13,8 @@ require (
 	github.com/manifoldco/promptui v0.9.0
 	github.com/samber/lo v1.53.0
 	github.com/spf13/cobra v1.10.2
+	github.com/swaggo/swag v1.16.6
+	github.com/xuri/excelize/v2 v2.11.0
 	gorm.io/gorm v1.31.2
 )
 
@@ -84,7 +87,6 @@ require (
 	github.com/go-openapi/swag/yamlutils v0.29.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
-	github.com/go-redsync/redsync/v4 v4.17.0 // indirect
 	github.com/go-sql-driver/mysql v1.10.0 // indirect
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/gofrs/flock v0.13.0 // indirect
@@ -137,6 +139,8 @@ require (
 	github.com/rabbitmq/amqp091-go v1.14.0 // indirect
 	github.com/redis/go-redis/v9 v9.22.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/richardlehane/mscfb v1.0.7 // indirect
+	github.com/richardlehane/msoleps v1.0.6 // indirect
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/rs/xid v1.6.0 // indirect
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
@@ -149,15 +153,17 @@ require (
 	github.com/stretchr/testify v1.12.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/swaggo/files v1.0.1 // indirect
-	github.com/swaggo/swag v1.16.6 // indirect
 	github.com/tidwall/gjson v1.19.0 // indirect
 	github.com/tidwall/match v1.2.0 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
+	github.com/tiendc/go-deepcopy v1.7.2 // indirect
 	github.com/tinylib/msgp v1.6.4 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/wagslane/go-rabbitmq v0.16.1 // indirect
 	github.com/wenlng/go-captcha/v2 v2.0.5 // indirect
 	github.com/xo/terminfo v1.0.0 // indirect
+	github.com/xuri/efp v0.0.1 // indirect
+	github.com/xuri/nfp v0.0.2-0.20250530014748-2ddeb826f9a9 // indirect
 	github.com/zeebo/xxh3 v1.1.0 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
