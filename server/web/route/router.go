@@ -11,4 +11,5 @@ func Router(router *server.Hertz) {
 
 	BasicRouter(router)
 
+	ShenhuoRouter(router)
 }
