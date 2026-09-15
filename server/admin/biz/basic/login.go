@@ -9,9 +9,9 @@ import (
 	"github.com/herhe-com/framework/constants/global"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/http"
-	"github.com/herhe-com/template/model"
-	req "github.com/herhe-com/template/server/admin/http/request/basic"
-	res "github.com/herhe-com/template/server/admin/http/response/basic"
+	"github.com/tizips/shenhuo/model"
+	req "github.com/tizips/shenhuo/server/admin/http/request/basic"
+	res "github.com/tizips/shenhuo/server/admin/http/response/basic"
 	"gorm.io/gorm"
 )
 

@@ -7,8 +7,8 @@ import (
 	"github.com/gookit/goutil/strutil"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/http"
-	"github.com/herhe-com/template/model"
-	"github.com/herhe-com/template/server/web/http/response/common"
+	"github.com/tizips/shenhuo/model"
+	"github.com/tizips/shenhuo/server/web/http/response/common"
 )
 
 func ToSetting(c context.Context, ctx *app.RequestContext, module string) {

@@ -1,4 +1,4 @@
-module github.com/herhe-com/template
+module github.com/tizips/shenhuo
 
 go 1.26.0
 

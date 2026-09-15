@@ -5,8 +5,8 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/http"
-	req "github.com/herhe-com/template/server/web/http/request/basic"
-	"github.com/herhe-com/template/server/web/http/response/basic"
+	req "github.com/tizips/shenhuo/server/web/http/request/basic"
+	"github.com/tizips/shenhuo/server/web/http/response/basic"
 	"path/filepath"
 )
 

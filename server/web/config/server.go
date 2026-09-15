@@ -4,7 +4,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/http/middleware"
-	"github.com/herhe-com/template/server/web/route"
+	"github.com/tizips/shenhuo/server/web/route"
 )
 
 func init() {

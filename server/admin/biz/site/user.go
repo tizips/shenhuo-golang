@@ -10,9 +10,9 @@ import (
 	"github.com/herhe-com/framework/contracts/http/response"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/http"
-	"github.com/herhe-com/template/model"
-	req "github.com/herhe-com/template/server/admin/http/request/site"
-	res "github.com/herhe-com/template/server/admin/http/response/site"
+	"github.com/tizips/shenhuo/model"
+	req "github.com/tizips/shenhuo/server/admin/http/request/site"
+	res "github.com/tizips/shenhuo/server/admin/http/response/site"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )

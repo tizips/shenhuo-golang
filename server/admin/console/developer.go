@@ -8,7 +8,7 @@ import (
 	"github.com/herhe-com/framework/contracts/console"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/validation"
-	"github.com/herhe-com/template/model"
+	"github.com/tizips/shenhuo/model"
 	"github.com/manifoldco/promptui"
 	"github.com/samber/lo"
 	"github.com/spf13/cobra"

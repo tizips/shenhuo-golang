@@ -3,7 +3,7 @@ package route
 import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/herhe-com/framework/http/middleware"
-	"github.com/herhe-com/template/server/admin/biz/site"
+	"github.com/tizips/shenhuo/server/admin/biz/site"
 )
 
 func SiteRouter(router *server.Hertz) {

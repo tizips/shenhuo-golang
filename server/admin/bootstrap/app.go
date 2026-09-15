@@ -6,7 +6,7 @@ import (
 	"github.com/herhe-com/framework/foundation"
 
 	//Delayed startup of other services init
-	"github.com/herhe-com/template/server/admin/config"
+	"github.com/tizips/shenhuo/server/admin/config"
 )
 
 func Boot() {

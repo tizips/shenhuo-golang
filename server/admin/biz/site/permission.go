@@ -9,7 +9,7 @@ import (
 	"github.com/herhe-com/framework/database/orm/scope"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/http"
-	"github.com/herhe-com/template/model"
+	"github.com/tizips/shenhuo/model"
 )
 
 func ToPermissions(c context.Context, ctx *app.RequestContext) {

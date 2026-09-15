@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/herhe-com/template/server/web/bootstrap"
+	"github.com/tizips/shenhuo/server/web/bootstrap"
 )
 
 func main() {

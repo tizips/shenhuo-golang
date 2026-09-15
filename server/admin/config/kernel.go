@@ -13,7 +13,7 @@ import (
 	"github.com/herhe-com/framework/microservice/locker"
 	"github.com/herhe-com/framework/microservice/snowflake"
 	"github.com/herhe-com/framework/validation"
-	consoles2 "github.com/herhe-com/template/server/admin/console"
+	consoles2 "github.com/tizips/shenhuo/server/admin/console"
 )
 
 func init() {

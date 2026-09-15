@@ -2,7 +2,7 @@
 
 ## Project Structure
 
-This is a Go module at `github.com/herhe-com/template`.
+This is a Go module at `github.com/tizips/shenhuo`.
 
 - `server/admin` contains the admin API service entrypoint, bootstrap, config, routes, business handlers, HTTP request/response DTOs, migrations, and console commands.
 - `server/web` contains the web API service entrypoint, bootstrap, config, routes, business handlers, and HTTP request/response DTOs.
