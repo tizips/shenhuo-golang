@@ -209,6 +209,10 @@ func DoRoleByCreate(c context.Context, ctx *app.RequestContext) {
 		}
 	}
 
+	//	去除重复提交的权限，避免同批次写入重复策略
+	permissions = lo.UniqBy(permissions, func(item []string) string { return item[0] })
+	bindings = lo.UniqBy(bindings, func(item model.SysRoleBindPermission) string { return item.Permission })
+
 	tx := facades.Database().Default().Begin()
 
 	role := model.SysRole{
@@ -234,9 +238,9 @@ func DoRoleByCreate(c context.Context, ctx *app.RequestContext) {
 		return
 	}
 
-	if ok, _ := facades.Casbin().AddPermissionsForUser(auth.NameOfRole(role.ID), permissions...); !ok {
+	if _, err := facades.Casbin().AddPermissionsForUser(auth.NameOfRole(role.ID), permissions...); err != nil {
 		tx.Rollback()
-		http.Fail(ctx, "创建失败")
+		http.Fail(ctx, "创建失败：%v", err)
 		return
 	}
 
@@ -361,6 +365,10 @@ func DoRoleByUpdate(c context.Context, ctx *app.RequestContext) {
 		}
 	}
 
+	//	去除重复提交的权限，避免同批次写入重复策略
+	permissions = lo.UniqBy(permissions, func(item []string) string { return item[0] })
+	bindings = lo.UniqBy(bindings, func(item model.SysRoleBindPermission) string { return item.Permission })
+
 	//	提取需要创建的权限
 	creates := lo.Filter(bindings, func(item model.SysRoleBindPermission, index int) bool {
 
@@ -416,15 +424,15 @@ func DoRoleByUpdate(c context.Context, ctx *app.RequestContext) {
 	if len(creates) > 0 || len(deletes) > 0 {
 
 		//	清除旧权限
-		if ok, _ := facades.Casbin().DeletePermissionsForUser(auth.NameOfRole(role.ID)); !ok {
+		if _, err := facades.Casbin().DeletePermissionsForUser(auth.NameOfRole(role.ID)); err != nil {
 			tx.Rollback()
-			http.Fail(ctx, "修改失败")
+			http.Fail(ctx, "修改失败：%v", err)
 			return
 		}
 
-		if ok, _ := facades.Casbin().AddPermissionsForUser(auth.NameOfRole(role.ID), permissions...); !ok {
+		if _, err := facades.Casbin().AddPermissionsForUser(auth.NameOfRole(role.ID), permissions...); err != nil {
 			tx.Rollback()
-			http.Fail(ctx, "修改失败")
+			http.Fail(ctx, "修改失败：%v", err)
 			return
 		}
 	}
@@ -473,9 +481,9 @@ func DoRoleByDelete(c context.Context, ctx *app.RequestContext) {
 	}
 
 	//	清除旧角色
-	if ok, _ := facades.Casbin().DeleteRole(auth.NameOfRole(role.ID)); !ok {
+	if _, err := facades.Casbin().DeleteRole(auth.NameOfRole(role.ID)); err != nil {
 		tx.Rollback()
-		http.Fail(ctx, "删除失败")
+		http.Fail(ctx, "删除失败：%v", err)
 		return
 	}
 

@@ -186,9 +186,9 @@ func DoUserByCreate(c context.Context, ctx *app.RequestContext) {
 		items[index] = auth.NameOfRole(item.RoleID)
 	}
 
-	if ok, _ := facades.Casbin().AddRolesForUser(auth.NameOfUser(user.ID), items, auth.SPlatform(ctx)); !ok {
+	if _, err := facades.Casbin().AddRolesForUser(auth.NameOfUser(user.ID), items, auth.SPlatform(ctx)); err != nil {
 		tx.Rollback()
-		http.Fail(ctx, "创建失败")
+		http.Fail(ctx, "创建失败：%v", err)
 		return
 	}
 
@@ -330,9 +330,9 @@ func DoUserByUpdate(c context.Context, ctx *app.RequestContext) {
 			items[index] = auth.NameOfRole(item.RoleID)
 		}
 
-		if ok, _ := facades.Casbin().AddRolesForUser(auth.NameOfUser(user.ID), items); !ok {
+		if _, err := facades.Casbin().AddRolesForUser(auth.NameOfUser(user.ID), items); err != nil {
 			tx.Rollback()
-			http.Fail(ctx, "修改失败")
+			http.Fail(ctx, "修改失败：%v", err)
 			return
 		}
 	}
@@ -347,9 +347,9 @@ func DoUserByUpdate(c context.Context, ctx *app.RequestContext) {
 
 		for _, item := range deletes {
 
-			if ok, _ := facades.Casbin().DeleteRoleForUser(auth.NameOfUser(user.ID), auth.NameOfRole(item)); !ok {
+			if _, err := facades.Casbin().DeleteRoleForUser(auth.NameOfUser(user.ID), auth.NameOfRole(item)); err != nil {
 				tx.Rollback()
-				http.Fail(ctx, "修改失败")
+				http.Fail(ctx, "修改失败：%v", err)
 				return
 			}
 		}
@@ -370,9 +370,9 @@ func DoUserByUpdate(c context.Context, ctx *app.RequestContext) {
 				items[index] = auth.NameOfRole(item.RoleID)
 			}
 
-			if ok, _ := facades.Casbin().AddRolesForUser(auth.NameOfUser(user.ID), items); !ok {
+			if _, err := facades.Casbin().AddRolesForUser(auth.NameOfUser(user.ID), items); err != nil {
 				tx.Rollback()
-				http.Fail(ctx, "修改失败")
+				http.Fail(ctx, "修改失败：%v", err)
 				return
 			}
 
@@ -381,9 +381,9 @@ func DoUserByUpdate(c context.Context, ctx *app.RequestContext) {
 
 			for _, item := range bindings {
 
-				if ok, _ := facades.Casbin().DeleteRoleForUser(auth.NameOfUser(user.ID), auth.NameOfRole(item.RoleID)); !ok {
+				if _, err := facades.Casbin().DeleteRoleForUser(auth.NameOfUser(user.ID), auth.NameOfRole(item.RoleID)); err != nil {
 					tx.Rollback()
-					http.Fail(ctx, "修改失败")
+					http.Fail(ctx, "修改失败：%v", err)
 					return
 				}
 			}
@@ -440,9 +440,9 @@ func DoUserByDelete(c context.Context, ctx *app.RequestContext) {
 
 	for _, item := range user.BindRoles {
 
-		if ok, _ := facades.Casbin().DeleteRoleForUser(auth.NameOfUser(user.ID), auth.NameOfRole(item.RoleID)); !ok {
+		if _, err := facades.Casbin().DeleteRoleForUser(auth.NameOfUser(user.ID), auth.NameOfRole(item.RoleID)); err != nil {
 			tx.Rollback()
-			http.Fail(ctx, "修改失败")
+			http.Fail(ctx, "删除失败：%v", err)
 			return
 		}
 	}
@@ -508,9 +508,9 @@ func DoUserByEnable(c context.Context, ctx *app.RequestContext) {
 				items[index] = auth.NameOfRole(item.RoleID)
 			}
 
-			if ok, _ := facades.Casbin().AddRolesForUser(auth.NameOfUser(user.ID), items); !ok {
+			if _, err := facades.Casbin().AddRolesForUser(auth.NameOfUser(user.ID), items); err != nil {
 				tx.Rollback()
-				http.Fail(ctx, "修改失败")
+				http.Fail(ctx, "修改失败：%v", err)
 				return
 			}
 
@@ -519,9 +519,9 @@ func DoUserByEnable(c context.Context, ctx *app.RequestContext) {
 
 			for _, item := range user.BindRoles {
 
-				if ok, _ := facades.Casbin().DeleteRoleForUser(auth.NameOfUser(user.ID), auth.NameOfRole(item.RoleID)); !ok {
+				if _, err := facades.Casbin().DeleteRoleForUser(auth.NameOfUser(user.ID), auth.NameOfRole(item.RoleID)); err != nil {
 					tx.Rollback()
-					http.Fail(ctx, "修改失败")
+					http.Fail(ctx, "修改失败：%v", err)
 					return
 				}
 			}
