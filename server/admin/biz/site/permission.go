@@ -25,9 +25,15 @@ func ToPermissions(c context.Context, ctx *app.RequestContext) {
 
 	var responses []authConstants.Tree
 
-	var codes []string
+	//	开发者返回完整权限树
 
-	if ok, _ := facades.Casbin().HasRoleForUser(auth.NameOfUser(auth.ID(ctx)), auth.NameOfDeveloper()); !ok {
+	if ok, _ := facades.Casbin().HasRoleForUser(auth.NameOfUser(auth.ID(ctx)), auth.NameOfDeveloper()); ok {
+
+		responses = auth.Trees(auth.Platform(ctx), true)
+
+	} else {
+
+		var codes []string
 
 		facades.Database().Default().
 			Scopes(scope.Platform(ctx)).
@@ -42,9 +48,9 @@ func ToPermissions(c context.Context, ctx *app.RequestContext) {
 				Select("1").Where(fmt.Sprintf("`%s`.`role_id`=`%s`.`id`", model.TableSysRoleBindPermission, model.TableSysRole)),
 			).
 			Pluck("permission", &codes)
-	}
 
-	responses = auth.Trees(auth.Platform(ctx), false, codes)
+		responses = auth.Trees(auth.Platform(ctx), false, codes)
+	}
 
 	http.Success(ctx, responses)
 }
