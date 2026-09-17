@@ -59,6 +59,7 @@ func ToDrawCategoryOfPaginate(c context.Context, ctx *app.RequestContext) {
 				Name:      item.Name,
 				Icon:      item.Icon,
 				Quota:     item.Quota,
+				Status:    item.Status,
 				Order:     item.Order,
 				Drawn:     drawn,
 				CreatedAt: item.CreatedAt.ToDateTimeString(),
@@ -116,10 +117,11 @@ func DoDrawCategoryOfCreate(c context.Context, ctx *app.RequestContext) {
 	}
 
 	item := model.ShDrawCategory{
-		Name:  request.Name,
-		Icon:  request.Icon,
-		Quota: request.Quota,
-		Order: helper.Order(request.Order),
+		Name:   request.Name,
+		Icon:   request.Icon,
+		Quota:  request.Quota,
+		Status: model.ShDrawCategoryStatusOfNotStarted,
+		Order:  helper.Order(request.Order),
 	}
 
 	if result := facades.Database().Default().WithContext(c).Create(&item); result.Error != nil {

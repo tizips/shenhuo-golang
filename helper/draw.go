@@ -35,6 +35,10 @@ func DrawCategory(tx *gorm.DB, categoryID uint) ([]model.ShDraw, error) {
 		return nil, errors.New("中签人数必须大于 0")
 	}
 
+	if category.Status == model.ShDrawCategoryStatusOfFinished {
+		return nil, errors.New("该类别抽签已结束")
+	}
+
 	var drawn int64
 	if err := tx.Model(&model.ShDraw{}).Where("`category_id`=?", category.ID).Count(&drawn).Error; err != nil {
 		return nil, err

@@ -47,6 +47,7 @@ func ToDrawOfList(c context.Context, ctx *app.RequestContext) {
 			Name:    item.Name,
 			Icon:    item.Icon,
 			Quota:   item.Quota,
+			Status:  item.Status,
 			Order:   item.Order,
 			Drawn:   len(draws),
 			Winners: winners,
