@@ -10,7 +10,7 @@
 编译镜像
 
 ```bash
-docker build -t herhe/admin:1.0.0 -f docker/admin.Dockerfile .
+docker build -t sh/s/admin:latest -f docker/admin.Dockerfile .
 ```
 
 运行容器
@@ -22,7 +22,7 @@ docker run \
   --net uper \
   --ip 172.19.0.115 \
   -v $PWD/server/admin/conf:/app/conf \
-  herhe/admin:1.0.0
+  sh/s/admin:latest
 ```
 
 ## WEB 接口
@@ -30,7 +30,7 @@ docker run \
 编译镜像
 
 ```bash
-docker build -t herhe/web:1.0.0 -f docker/web.Dockerfile .
+docker build -t sh/s/web:latest -f docker/web.Dockerfile .
 ```
 
 运行容器
@@ -42,5 +42,5 @@ docker run \
   --net uper \
   --ip 172.19.0.113 \
   -v $PWD/server/web/conf:/app/conf \
-  herhe/web:1.0.0
+  sh/s/web:latest
 ```

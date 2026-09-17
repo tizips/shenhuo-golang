@@ -26,8 +26,14 @@ go test ./...
 go run ./server/admin server
 go run ./server/web server
 go run ./server/admin developer
-docker build -t herhe/admin:1.0.0 -f docker/admin.Dockerfile .
-docker build -t herhe/web:1.0.0 -f docker/web.Dockerfile .
+docker buildx build -t sh/s/admin:latest -f docker/admin.Dockerfile .
+docker buildx build -t sh/s/web:latest -f docker/web.Dockerfile .
+```
+
+Target platform is `linux/amd64` (x86_64), enforced by the build constraints file `docker/buildx.build.constraints.hcl` instead of being pinned inside the Dockerfiles. When building with BuildKit's CLI, apply it via:
+
+```bash
+buildctl build --build-constraints-file docker/buildx.build.constraints.hcl ...
 ```
 
 Use the repository's normal command wrapper when operating in this workspace:

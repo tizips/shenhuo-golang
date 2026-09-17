@@ -7,6 +7,9 @@ FROM golang:1.27 AS builder
 # Add Maintainer Info
 LABEL maintainer="tizips <tizips@163.com>"
 
+# Enable Go modules proxy for mainland China
+ENV GOPROXY=https://goproxy.cn,direct
+
 # Set the Current Working Directory inside the container
 WORKDIR /build
 
@@ -31,6 +34,7 @@ WORKDIR /app
 # Copy the Pre-build binary file from the previous stage
 COPY --from=builder /build/server/admin/application .
 COPY --from=builder /build/server/admin/conf ./conf
+COPY --from=builder /build/server/admin/migration ./migration
 
 # Expose port 8080 to the outside world
 EXPOSE 9600

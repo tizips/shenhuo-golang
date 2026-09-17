@@ -7,6 +7,9 @@ FROM golang:1.27 AS builder
 # Add Maintainer Info
 LABEL maintainer="tizips <tizips@163.com>"
 
+# Enable Go modules proxy for mainland China
+ENV GOPROXY=https://goproxy.cn,direct
+
 # Set the Current Working Directory inside the container
 WORKDIR /build
 
