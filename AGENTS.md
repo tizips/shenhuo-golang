@@ -26,15 +26,18 @@ go test ./...
 go run ./server/admin server
 go run ./server/web server
 go run ./server/admin developer
-docker buildx build -t sh/s/admin:latest -f docker/admin.Dockerfile .
-docker buildx build -t sh/s/web:latest -f docker/web.Dockerfile .
+docker buildx bake
 ```
 
-Target platform is `linux/amd64` (x86_64), enforced by the build constraints file `docker/buildx.build.constraints.hcl` instead of being pinned inside the Dockerfiles. When building with BuildKit's CLI, apply it via:
+Target platform is `linux/amd64` (x86_64), enforced by the bake file `docker-bake.hcl` instead of being pinned inside the Dockerfiles. Build both images with:
 
 ```bash
-buildctl build --build-constraints-file docker/buildx.build.constraints.hcl ...
+docker buildx bake
 ```
+
+or a single target with `docker buildx bake admin` / `docker buildx bake web`.
+
+`docker/buildx.build.constraints.hcl` is kept for the legacy BuildKit CLI (`buildctl build --build-constraints-file ...`) and is not read by `docker buildx build`.
 
 Use the repository's normal command wrapper when operating in this workspace:
 
