@@ -194,7 +194,8 @@ func SiteRouter(router *server.Hertz) {
 
 		media := route.Group("media")
 		{
-			media.POST("", middleware.Permission("site.media.create"), site.DoMediaOfCreate)
+			media.POST("images", middleware.Permission("site.media.create"), site.DoMediaOfCreateByImage)
+			media.POST("video", middleware.Permission("site.media.create"), site.DoMediaOfCreateByVideo)
 		}
 
 		managers := route.Group("managers")

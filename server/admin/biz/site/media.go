@@ -68,26 +68,68 @@ func ToMediaOfPaginate(c context.Context, ctx *app.RequestContext) {
 	http.Success(ctx, responses)
 }
 
-// DoMediaOfCreate
-// @Summary 创建媒体
+// DoMediaOfCreateByImage
+// @Summary 批量添加图片
 // @Description Permissions: site.media.create
 // @Tags 站点-媒体
 // @Accept json
 // @Produce json
 // @Security ApiKeyAuth
-// @Param request body req.DoMediaOfCreate true "媒体信息"
+// @Param request body req.DoMediaOfCreateByImage true "图片信息"
 // @Success 200 {object} nil "创建成功"
-// @Router /site/media [post]
-func DoMediaOfCreate(c context.Context, ctx *app.RequestContext) {
+// @Router /site/media/images [post]
+func DoMediaOfCreateByImage(c context.Context, ctx *app.RequestContext) {
 
-	var request req.DoMediaOfCreate
+	var request req.DoMediaOfCreateByImage
 
 	if err := ctx.BindAndValidate(&request); err != nil {
 		http.BadRequest(ctx, err)
 		return
 	}
 
-	if request.Type == model.ShMediaOfTypeVideo && strings.TrimSpace(request.Title) == "" {
+	if !sceneExists(c, request.SceneID) {
+		http.Fail(ctx, "场景不存在")
+		return
+	}
+
+	medias := make([]model.ShMedia, len(request.URLs))
+	for index, url := range request.URLs {
+		medias[index] = model.ShMedia{
+			SceneID: request.SceneID,
+			Type:    model.ShMediaOfTypeImage,
+			URL:     url,
+			IsTop:   request.IsTop,
+		}
+	}
+
+	if result := facades.Database().Default().WithContext(c).Create(&medias); result.Error != nil {
+		http.Fail(ctx, "创建失败：%v", result.Error)
+		return
+	}
+
+	http.Success[any](ctx)
+}
+
+// DoMediaOfCreateByVideo
+// @Summary 添加视频
+// @Description Permissions: site.media.create；标题必填
+// @Tags 站点-媒体
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body req.DoMediaOfCreateByVideo true "视频信息"
+// @Success 200 {object} nil "创建成功"
+// @Router /site/media/video [post]
+func DoMediaOfCreateByVideo(c context.Context, ctx *app.RequestContext) {
+
+	var request req.DoMediaOfCreateByVideo
+
+	if err := ctx.BindAndValidate(&request); err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
+	if strings.TrimSpace(request.Title) == "" {
 		http.Fail(ctx, "视频标题不能为空")
 		return
 	}
@@ -99,7 +141,7 @@ func DoMediaOfCreate(c context.Context, ctx *app.RequestContext) {
 
 	media := model.ShMedia{
 		SceneID: request.SceneID,
-		Type:    request.Type,
+		Type:    model.ShMediaOfTypeVideo,
 		Title:   strings.TrimSpace(request.Title),
 		URL:     request.URL,
 		IsTop:   request.IsTop,

@@ -2,6 +2,8 @@ package config
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/cloudwego/hertz/pkg/app/server"
+	"github.com/cloudwego/hertz/pkg/common/config"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/http/middleware"
 	"github.com/tizips/shenhuo/server/web/route"
@@ -16,7 +18,9 @@ func init() {
 		"port":    cfg.Env("server.port", "9600"),
 		"route":   route.Router,
 		//"handle":  func(server *server.Hertz) {},
-		//"options": []config.Option{},
+		"options": []config.Option{
+			server.WithMaxRequestBodySize(500 * 1024 * 1024),
+		},
 		"middlewares": []app.HandlerFunc{
 			middleware.Access(),
 		},

@@ -31,9 +31,16 @@ func ShenhuoRouter(router *server.Hertz) {
 	router.GET("schedules", shenhuo.ToScheduleOfList)
 	router.GET("draws", shenhuo.ToDrawOfList)
 	router.GET("scenes", shenhuo.ToSceneOfList)
+
+	media := router.Group("media")
+	{
+		media.GET("pinned", shenhuo.ToMediaOfPinned)
+		media.POST("images", middleware.Auth(), middle.Manager(), shenhuo.DoMediaOfCreateByImage)
+		media.POST("video", middleware.Auth(), middle.Manager(), shenhuo.DoMediaOfCreateByVideo)
+	}
+
 	medias := router.Group("medias")
 	{
-		medias.GET("pinned", shenhuo.ToMediaOfPinned)
 		medias.GET("", shenhuo.ToMediaOfPaginate)
 	}
 
@@ -44,9 +51,8 @@ func ShenhuoRouter(router *server.Hertz) {
 		score.GET("mine", shenhuo.ToScoreOfMine)
 	}
 
-	manager := router.Group("").Use(middleware.Auth(), middle.Manager())
+	draw := router.Group("draw").Use(middleware.Auth(), middle.Manager())
 	{
-		manager.POST("draw", shenhuo.DoDrawOfCreate)
-		manager.POST("media", shenhuo.DoMediaOfCreate)
+		draw.POST("", shenhuo.DoDrawOfCreate)
 	}
 }
