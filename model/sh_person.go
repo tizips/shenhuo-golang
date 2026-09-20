@@ -15,6 +15,7 @@ type ShPerson struct {
 	Password           string         `gorm:"column:password"`
 	Number             string         `gorm:"column:number"`
 	GroupName          string         `gorm:"column:group_name"`
+	OpenID             string         `gorm:"column:openid"`
 	MustChangePassword uint8          `gorm:"column:must_change_password"`
 	CreatedAt          carbon.Carbon  `gorm:"column:created_at;autoCreateTime" carbon:"type:dateTime"`
 	UpdatedAt          carbon.Carbon  `gorm:"column:updated_at;autoUpdateTime" carbon:"type:dateTime"`
