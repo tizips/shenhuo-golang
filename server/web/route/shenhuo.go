@@ -49,6 +49,11 @@ func ShenhuoRouter(router *server.Hertz) {
 		medias.GET("", shenhuo.ToMediaOfPaginate)
 	}
 
+	system := router.Group("system")
+	{
+		system.GET("config", shenhuo.ToSystemOfConfig)
+	}
+
 	router.POST("score/query", shenhuo.ToScoreOfQuery)
 
 	score := router.Group("score").Use(middleware.Auth(), middle.Person())
