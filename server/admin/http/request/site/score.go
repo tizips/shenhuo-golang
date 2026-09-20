@@ -37,3 +37,8 @@ type DoScoreOfDelete struct {
 type ToScoreOfInformation struct {
 	request.IDOfUint
 }
+
+// DoScoreOfNotify 推送成绩通知请求；ID 为抽签分组（抽签类别）ID，向该分组下所有已出成绩的人员推送
+type DoScoreOfNotify struct {
+	CategoryID uint `json:"category_id" form:"category_id" validate:"required,gt=0" label:"抽签分组"` // 抽签分组ID
+}

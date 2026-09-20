@@ -105,7 +105,7 @@ func site() contractauth.Permission {
 			crud("scene", "场景"),
 			crud("media", "精彩媒体"),
 			crud("manager", "管理人员", action("enable", "启禁")),
-			crud("score", "成绩", action("import", "导入")),
+			crud("score", "成绩", action("import", "导入"), action("notify", "推送")),
 		},
 	}
 }

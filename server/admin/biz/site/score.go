@@ -12,6 +12,7 @@ import (
 	"github.com/tizips/shenhuo/model"
 	req "github.com/tizips/shenhuo/server/admin/http/request/site"
 	res "github.com/tizips/shenhuo/server/admin/http/response/site"
+	"github.com/tizips/shenhuo/wechat"
 	"github.com/xuri/excelize/v2"
 	"gorm.io/gorm"
 )
@@ -392,6 +393,65 @@ func DoScoreOfImport(c context.Context, ctx *app.RequestContext) {
 	tx.Commit()
 
 	http.Success(ctx, responses)
+}
+
+// DoScoreOfNotify 推送成绩通知
+// @Summary 推送成绩通知
+// @Description Permissions: site.score.notify；按抽签分组推送，向分组下所有已出成绩、且绑定了微信的参赛人员发送成绩发布通知
+// @Tags 站点-成绩
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body req.DoScoreOfNotify true "请求参数（抽签分组ID）"
+// @Success 200 {object} res.DoScoreOfNotify "推送结果"
+// @Router /site/score/notify [post]
+func DoScoreOfNotify(c context.Context, ctx *app.RequestContext) {
+
+	var request req.DoScoreOfNotify
+
+	if err := ctx.BindAndValidate(&request); err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
+	var category model.ShDrawCategory
+	if err := facades.Database().Default().WithContext(c).First(&category, "`id`=?", request.CategoryID).Error; err != nil {
+		writeFindError(ctx, err)
+		return
+	}
+
+	var scores []model.ShScore
+
+	facades.Database().Default().WithContext(c).
+		Joins("JOIN `"+model.TableShDraw+"` ON `"+model.TableShDraw+"`.`person_id` = `"+model.TableShScore+"`.`person_id`").
+		Where("`"+model.TableShDraw+"`.`category_id`=?", request.CategoryID).
+		Preload("Person").
+		Order("`" + model.TableShScore + "`.`order` asc").
+		Find(&scores)
+
+	if len(scores) == 0 {
+		http.Fail(ctx, "该抽签分组下暂无成绩记录")
+		return
+	}
+
+	response := res.DoScoreOfNotify{Group: category.Name, Total: len(scores)}
+
+	for _, score := range scores {
+
+		if score.Person == nil || score.Person.OpenID == "" {
+			response.Skipped++
+			continue
+		}
+
+		if err := wechat.SendScoreNotice(c, score.Person.OpenID, score.Person.Name, score.Person.Number, score.Total); err != nil {
+			response.Failed++
+			continue
+		}
+
+		response.Sent++
+	}
+
+	http.Success(ctx, response)
 }
 
 // buildScoreItems 按固定小项顺序组装成绩小项。

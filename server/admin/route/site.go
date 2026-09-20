@@ -223,6 +223,7 @@ func SiteRouter(router *server.Hertz) {
 		{
 			score.POST("", middleware.Permission("site.score.create"), site.DoScoreOfCreate)
 			score.POST("import", middleware.Permission("site.score.import"), site.DoScoreOfImport)
+			score.POST("notify", middleware.Permission("site.score.notify"), site.DoScoreOfNotify)
 			score.GET("template", middleware.Permission("site.score.import"), site.ToScoreOfTemplate)
 		}
 	}

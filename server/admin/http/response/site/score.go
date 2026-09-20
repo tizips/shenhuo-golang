@@ -28,3 +28,12 @@ type DoScoreOfImport struct {
 	Updated int `json:"updated"` // 成功更新数
 	Skipped int `json:"skipped"` // 跳过数；通常为无效数据
 }
+
+// DoScoreOfNotify 推送成绩通知结果响应
+type DoScoreOfNotify struct {
+	Group   string `json:"group"`   // 抽签分组名称
+	Total   int    `json:"total"`   // 分组下成绩总数
+	Sent    int    `json:"sent"`    // 推送成功数
+	Skipped int    `json:"skipped"` // 跳过数；未绑定微信的人员
+	Failed  int    `json:"failed"`  // 推送失败数
+}
