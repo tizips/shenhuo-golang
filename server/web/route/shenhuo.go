@@ -9,9 +9,14 @@ import (
 
 func ShenhuoRouter(router *server.Hertz) {
 
+	article := router.Group("article")
+	{
+		article.GET("pinned", shenhuo.ToArticleOfPinned)
+		article.GET("recommend", shenhuo.ToArticleOfRecommend)
+	}
+
 	articles := router.Group("articles")
 	{
-		articles.GET("pinned", shenhuo.ToArticleOfPinned)
 		articles.GET(":id", shenhuo.ToArticleOfInformation)
 		articles.GET("", shenhuo.ToArticleOfPaginate)
 	}

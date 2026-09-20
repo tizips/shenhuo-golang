@@ -5,7 +5,6 @@ import (
 	"errors"
 
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/golang-module/carbon/v2"
 	"github.com/herhe-com/framework/constants/global"
 	"github.com/herhe-com/framework/contracts/http/response"
 	"github.com/herhe-com/framework/facades"
@@ -23,12 +22,34 @@ import (
 // @Accept json
 // @Produce json
 // @Success 200 {array} res.ToArticle "置顶资讯"
-// @Router /articles/pinned [get]
+// @Router /article/pinned [get]
 func ToArticleOfPinned(c context.Context, ctx *app.RequestContext) {
 
 	var articles []model.ShArticle
 
-	published(c).Where("`is_top`=?", global.YES).Order("`published_at` desc, `id` desc").Find(&articles)
+	database().Where("`is_top`=?", global.YES).Order("`published_at` desc, `id` desc").Find(&articles)
+
+	responses := make([]res.ToArticle, len(articles))
+	for index, item := range articles {
+		responses[index] = articleToList(item)
+	}
+
+	http.Success(ctx, responses)
+}
+
+// ToArticleOfRecommend
+// @Summary 获取首页推荐资讯
+// @Description 获取已推荐的资讯列表
+// @Tags 资讯
+// @Accept json
+// @Produce json
+// @Success 200 {array} res.ToArticle "推荐资讯"
+// @Router /article/recommend [get]
+func ToArticleOfRecommend(c context.Context, ctx *app.RequestContext) {
+
+	var articles []model.ShArticle
+
+	database().Where("`is_recommend`=?", global.YES).Order("`published_at` desc, `id` desc").Find(&articles)
 
 	responses := make([]res.ToArticle, len(articles))
 	for index, item := range articles {
@@ -62,7 +83,7 @@ func ToArticleOfPaginate(c context.Context, ctx *app.RequestContext) {
 		Size: request.GetSize(),
 	}
 
-	tx := published(c).Where("`is_top`=?", global.NO)
+	tx := database().Where("`is_top`=?", global.NO)
 
 	tx.Count(&responses.Total)
 
@@ -101,7 +122,7 @@ func ToArticleOfInformation(c context.Context, ctx *app.RequestContext) {
 
 	var article model.ShArticle
 
-	fu := published(c).First(&article, "`id`=?", request.ID)
+	fu := database().First(&article, "`id`=?", request.ID)
 	if errors.Is(fu.Error, gorm.ErrRecordNotFound) {
 		http.NotFound(ctx, "未找到该数据")
 		return
@@ -116,8 +137,8 @@ func ToArticleOfInformation(c context.Context, ctx *app.RequestContext) {
 	http.Success(ctx, item)
 }
 
-func published(c context.Context) *gorm.DB {
-	return facades.Database().Default().WithContext(c).Model(&model.ShArticle{}).Where("`published_at` <= ?", carbon.Now().ToDateTimeString())
+func database() *gorm.DB {
+	return facades.Database().Default().Model(&model.ShArticle{})
 }
 
 func articleToList(item model.ShArticle) res.ToArticle {
