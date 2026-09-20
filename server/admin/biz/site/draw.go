@@ -14,6 +14,7 @@ import (
 	"github.com/tizips/shenhuo/model"
 	req "github.com/tizips/shenhuo/server/admin/http/request/site"
 	res "github.com/tizips/shenhuo/server/admin/http/response/site"
+	"github.com/tizips/shenhuo/wechat"
 	"gorm.io/gorm"
 )
 
@@ -109,6 +110,9 @@ func DoDrawOfCreate(c context.Context, ctx *app.RequestContext) {
 	}
 
 	tx.Commit()
+
+	// 抽签结束后向中签人员发送微信通知；尽力而为，不影响抽签结果
+	wechat.NotifyDraws(c, facades.Database().Default(), draws)
 
 	responses := make([]res.DoDrawOfCreate, len(draws))
 	for index, item := range draws {
