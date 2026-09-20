@@ -24,18 +24,49 @@ func ShenhuoRouter(router *server.Hertz) {
 	pages := router.Group("pages")
 	{
 		pages.GET(":id", shenhuo.ToPageOfInformation)
-		pages.GET("key/:key", shenhuo.ToPageOfInformationByKey)
 		pages.GET("", shenhuo.ToPageOfList)
 	}
 
-	router.GET("persons", shenhuo.ToPersonOfList)
-	router.GET("persons/groups", shenhuo.ToPersonOfGroupList)
-	router.GET("persons/groups/:id", shenhuo.ToPersonOfGroupInformation)
-	router.GET("navs", shenhuo.ToNavOfList)
-	router.GET("banners", shenhuo.ToBannerOfList)
-	router.GET("schedules", shenhuo.ToScheduleOfList)
-	router.GET("draws", shenhuo.ToDrawOfList)
-	router.GET("scenes", shenhuo.ToSceneOfList)
+	page := router.Group("page")
+	{
+		page.GET("keys/:key", shenhuo.ToPageOfInformationByKey)
+	}
+
+	persons := router.Group("persons")
+	{
+		persons.GET("", shenhuo.ToPersonOfList)
+
+		groups := persons.Group("groups")
+		{
+			groups.GET("", shenhuo.ToPersonOfGroupList)
+			groups.GET(":id", shenhuo.ToPersonOfGroupInformation)
+		}
+	}
+
+	navs := router.Group("navs")
+	{
+		navs.GET("", shenhuo.ToNavOfList)
+	}
+
+	banners := router.Group("banners")
+	{
+		banners.GET("", shenhuo.ToBannerOfList)
+	}
+
+	schedules := router.Group("schedules")
+	{
+		schedules.GET("", shenhuo.ToScheduleOfList)
+	}
+
+	draws := router.Group("draws")
+	{
+		draws.GET("", shenhuo.ToDrawOfList)
+	}
+
+	scenes := router.Group("scenes")
+	{
+		scenes.GET("", shenhuo.ToSceneOfList)
+	}
 
 	media := router.Group("media")
 	{
@@ -54,11 +85,10 @@ func ShenhuoRouter(router *server.Hertz) {
 		system.GET("config", shenhuo.ToSystemOfConfig)
 	}
 
-	router.POST("score/query", shenhuo.ToScoreOfQuery)
-
-	score := router.Group("score").Use(middleware.Auth(), middle.Person())
+	score := router.Group("score")
 	{
-		score.GET("mine", shenhuo.ToScoreOfMine)
+		score.POST("query", shenhuo.ToScoreOfQuery)
+		score.GET("mine", middleware.Auth(), middle.Person(), shenhuo.ToScoreOfMine)
 	}
 
 	draw := router.Group("draw").Use(middleware.Auth(), middle.Manager())

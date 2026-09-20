@@ -82,7 +82,7 @@ func ToPageOfInformation(c context.Context, ctx *app.RequestContext) {
 // @Produce json
 // @Param key path string true "页面标识"
 // @Success 200 {object} res.ToPage "页面详情"
-// @Router /pages/key/{key} [get]
+// @Router /page/keys/{key} [get]
 func ToPageOfInformationByKey(c context.Context, ctx *app.RequestContext) {
 
 	var request req.ToPageOfInformationByKey
