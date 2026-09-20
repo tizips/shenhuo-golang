@@ -12,6 +12,7 @@ import (
 	"github.com/tizips/shenhuo/server/web/constants"
 	req "github.com/tizips/shenhuo/server/web/http/request/basic"
 	res "github.com/tizips/shenhuo/server/web/http/response/basic"
+	"github.com/tizips/shenhuo/wechat"
 )
 
 // DoLoginOfManager
@@ -67,6 +68,49 @@ func DoLoginOfPerson(c context.Context, ctx *app.RequestContext) {
 	if fu.Error != nil || !auth.CheckPassword(request.Password, person.Password) {
 		http.Fail(ctx, "手机号或密码错误")
 		return
+	}
+
+	writeLogin(ctx, person.ID, constants.JwtKindPerson, person.Name, person.Mobile, person.MustChangePassword)
+}
+
+// DoLoginOfWeChat
+// @Summary 参赛人员微信登录
+// @Description 参赛人员使用手机号、密码和微信服务号网页授权 Code 登录，登录成功后将 OpenID 绑定到当前用户
+// @Tags 基础-登录
+// @Accept json
+// @Produce json
+// @Param request body req.DoLoginOfWeChat true "登录信息"
+// @Success 200 {object} res.DoLogin "登录成功"
+// @Router /basic/login/wechat [post]
+func DoLoginOfWeChat(c context.Context, ctx *app.RequestContext) {
+
+	var request req.DoLoginOfWeChat
+
+	if err := ctx.BindAndValidate(&request); err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
+	// 先校验账号密码：Code 一次性目只能用 5 分钟，避免账号密码错误时白白消耗 Code
+	var person model.ShPerson
+
+	fu := facades.Database().Default().WithContext(c).First(&person, "`mobile`=?", request.Mobile)
+	if fu.Error != nil || !auth.CheckPassword(request.Password, person.Password) {
+		http.Fail(ctx, "手机号或密码错误")
+		return
+	}
+
+	openID, err := wechat.OpenIDOfCode(c, request.Code)
+	if err != nil {
+		http.Fail(ctx, "微信授权失败：%v", err)
+		return
+	}
+
+	// 绑定 OpenID 到当前用户；绑定失败不阻断登录
+	if result := facades.Database().Default().WithContext(c).Model(&model.ShPerson{}).
+		Where("`id`=?", person.ID).
+		Update("openid", openID); result.Error == nil {
+		person.OpenID = openID
 	}
 
 	writeLogin(ctx, person.ID, constants.JwtKindPerson, person.Name, person.Mobile, person.MustChangePassword)

@@ -85,6 +85,11 @@ func ShenhuoRouter(router *server.Hertz) {
 		system.GET("config", shenhuo.ToSystemOfConfig)
 	}
 
+	wechat := router.Group("wechat")
+	{
+		wechat.GET("oauth", shenhuo.ToWechatOfOAuth)
+	}
+
 	score := router.Group("score")
 	{
 		score.POST("query", shenhuo.ToScoreOfQuery)

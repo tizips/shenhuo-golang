@@ -15,6 +15,7 @@ func BasicRouter(router *server.Hertz) {
 		{
 			login.POST("manager", middleware.LoginLimiter(), basic.DoLoginOfManager)
 			login.POST("person", middleware.LoginLimiter(), basic.DoLoginOfPerson)
+			login.POST("wechat", middleware.LoginLimiter(), basic.DoLoginOfWeChat)
 		}
 
 		account := route.Group("account").Use(middleware.Auth())
