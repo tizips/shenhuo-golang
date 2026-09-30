@@ -6,6 +6,7 @@ type ToPersonOfPaginate struct {
 	Name               string `json:"name"`                 // 姓名
 	Unit               string `json:"unit"`                 // 所属单位
 	Mobile             string `json:"mobile"`               // 手机号
+	IDCard             string `json:"id_card"`              // 身份证号
 	Number             string `json:"number"`               // 参赛号
 	GroupName          string `json:"group_name"`           // 所属小组名称
 	MustChangePassword uint8  `json:"must_change_password"` // 是否需强制修改密码；枚举：1=是，2=否

@@ -12,6 +12,7 @@ type ShPerson struct {
 	Name               string         `gorm:"column:name"`
 	Unit               string         `gorm:"column:unit"`
 	Mobile             string         `gorm:"column:mobile"`
+	IDCard             string         `gorm:"column:id_card"`
 	Password           string         `gorm:"column:password"`
 	Number             string         `gorm:"column:number"`
 	GroupName          string         `gorm:"column:group_name"`

@@ -35,9 +35,9 @@ func ToScoreOfQuery(c context.Context, ctx *app.RequestContext) {
 
 	var person model.ShPerson
 
-	fp := facades.Database().Default().WithContext(c).First(&person, "`mobile`=?", request.Mobile)
+	fp := facades.Database().Default().WithContext(c).First(&person, "`id_card`=?", request.IDCard)
 	if fp.Error != nil || !auth.CheckPassword(request.Password, person.Password) {
-		http.Fail(ctx, "手机号或密码错误")
+		http.Fail(ctx, "身份证号或密码错误")
 		return
 	}
 

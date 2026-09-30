@@ -12,7 +12,8 @@ type ToPersonOfPaginate struct {
 type DoPersonOfCreate struct {
 	Name      string `json:"name" form:"name" validate:"required,max=32" label:"姓名"`               // 人员姓名
 	Unit      string `json:"unit" form:"unit" validate:"required,max=64" label:"单位"`               // 所属单位
-	Mobile    string `json:"mobile" form:"mobile" validate:"required,mobile" label:"手机号"`          // 手机号；用于登录
+	Mobile    string `json:"mobile" form:"mobile" validate:"omitempty,mobile" label:"手机号"`         // 手机号；用于登录，可为空
+	IDCard    string `json:"id_card" form:"id_card" validate:"required,idCard" label:"身份证号"`       // 身份证号
 	Password  string `json:"password" form:"password" validate:"required,password" label:"密码"`     // 登录密码
 	Number    string `json:"number" form:"number" validate:"required,max=32" label:"参赛号"`          // 参赛号
 	GroupName string `json:"group_name" form:"group_name" validate:"required,max=64" label:"小组名称"` // 所属小组名称
@@ -22,7 +23,8 @@ type DoPersonOfCreate struct {
 type DoPersonOfUpdate struct {
 	Name      string `json:"name" form:"name" validate:"required,max=32" label:"姓名"`               // 人员姓名
 	Unit      string `json:"unit" form:"unit" validate:"required,max=64" label:"单位"`               // 所属单位
-	Mobile    string `json:"mobile" form:"mobile" validate:"required,mobile" label:"手机号"`          // 手机号；用于登录
+	Mobile    string `json:"mobile" form:"mobile" validate:"omitempty,mobile" label:"手机号"`         // 手机号；用于登录，可为空
+	IDCard    string `json:"id_card" form:"id_card" validate:"required,idCard" label:"身份证号"`       // 身份证号
 	Password  string `json:"password" form:"password" validate:"omitempty,password" label:"密码"`    // 新密码；留空表示不修改
 	Number    string `json:"number" form:"number" validate:"required,max=32" label:"参赛号"`          // 参赛号
 	GroupName string `json:"group_name" form:"group_name" validate:"required,max=64" label:"小组名称"` // 所属小组名称

@@ -3,6 +3,8 @@ package site
 import (
 	"context"
 	"errors"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -49,7 +51,7 @@ func ToPersonOfPaginate(c context.Context, ctx *app.RequestContext) {
 
 	if request.Keyword != "" {
 		like := "%" + request.Keyword + "%"
-		tx = tx.Where("`name` LIKE ? OR `mobile` LIKE ? OR `number` LIKE ? OR `group_name` LIKE ? OR `unit` LIKE ?", like, like, like, like, like)
+		tx = tx.Where("`name` LIKE ? OR `mobile` LIKE ? OR `id_card` LIKE ? OR `number` LIKE ? OR `group_name` LIKE ? OR `unit` LIKE ?", like, like, like, like, like, like)
 	}
 
 	tx.Count(&responses.Total)
@@ -145,7 +147,7 @@ func DoPersonOfCreate(c context.Context, ctx *app.RequestContext) {
 		return
 	}
 
-	if err := assertPersonUnique(c, request.Mobile, request.Number, ""); err != nil {
+	if err := assertPersonUnique(c, request.Mobile, request.IDCard, request.Number, ""); err != nil {
 		http.Fail(ctx, "%s", err.Error())
 		return
 	}
@@ -155,6 +157,7 @@ func DoPersonOfCreate(c context.Context, ctx *app.RequestContext) {
 		Name:               request.Name,
 		Unit:               request.Unit,
 		Mobile:             request.Mobile,
+		IDCard:             request.IDCard,
 		Password:           auth.Password(request.Password),
 		Number:             request.Number,
 		GroupName:          request.GroupName,
@@ -196,7 +199,7 @@ func DoPersonOfUpdate(c context.Context, ctx *app.RequestContext) {
 		return
 	}
 
-	if err := assertPersonUnique(c, request.Mobile, request.Number, person.ID); err != nil {
+	if err := assertPersonUnique(c, request.Mobile, request.IDCard, request.Number, person.ID); err != nil {
 		http.Fail(ctx, "%s", err.Error())
 		return
 	}
@@ -204,6 +207,7 @@ func DoPersonOfUpdate(c context.Context, ctx *app.RequestContext) {
 	person.Name = request.Name
 	person.Unit = request.Unit
 	person.Mobile = request.Mobile
+	person.IDCard = request.IDCard
 	person.Number = request.Number
 	person.GroupName = request.GroupName
 
@@ -303,23 +307,38 @@ func DoPersonOfImport(c context.Context, ctx *app.RequestContext) {
 		name := helper.CellByName(row, headers, "姓名")
 		unit := helper.CellByName(row, headers, "单位")
 		mobile := helper.CellByName(row, headers, "手机号", "手机")
+		idCard := helper.CellByName(row, headers, "身份证号", "身份证")
 		number := helper.CellByName(row, headers, "参赛号", "编号")
 		group := helper.CellByName(row, headers, "小组名称", "小组")
 
-		if name == "" && unit == "" && mobile == "" && number == "" && group == "" {
+		if name == "" && unit == "" && mobile == "" && idCard == "" && number == "" && group == "" {
 			responses.Skipped++
 			continue
 		}
 
-		if name == "" || unit == "" || mobile == "" || number == "" || group == "" {
+		if name == "" || unit == "" || number == "" || group == "" {
 			tx.Rollback()
 			http.Fail(ctx, "导入失败：存在必填字段为空的行")
 			return
 		}
 
-		if err = assertPersonUniqueTx(tx, mobile, number, ""); err != nil {
+		if idCard != "" && !regexp.MustCompile(`^\d{17}[\dX]$`).MatchString(strings.ToUpper(idCard)) {
+			tx.Rollback()
+			http.Fail(ctx, "导入失败：存在无效的身份证号")
+			return
+		}
+
+		if err = assertPersonUniqueTx(tx, mobile, idCard, number, ""); err != nil {
 			responses.Skipped++
 			continue
+		}
+
+		passwordOf := mobile
+		if passwordOf == "" {
+			passwordOf = idCard
+		}
+		if passwordOf == "" {
+			passwordOf = number
 		}
 
 		person := model.ShPerson{
@@ -327,7 +346,8 @@ func DoPersonOfImport(c context.Context, ctx *app.RequestContext) {
 			Name:               name,
 			Unit:               unit,
 			Mobile:             mobile,
-			Password:           auth.Password(helper.PersonImportPassword(mobile, now)),
+			IDCard:             idCard,
+			Password:           auth.Password(helper.PersonImportPassword(passwordOf, now)),
 			Number:             number,
 			GroupName:          group,
 			MustChangePassword: global.YES,
@@ -353,6 +373,7 @@ func personToPaginate(item model.ShPerson) res.ToPersonOfPaginate {
 		Name:               item.Name,
 		Unit:               item.Unit,
 		Mobile:             item.Mobile,
+		IDCard:             item.IDCard,
 		Number:             item.Number,
 		GroupName:          item.GroupName,
 		MustChangePassword: item.MustChangePassword,
@@ -364,23 +385,36 @@ func firstBySID(c context.Context, dest any, id string) error {
 	return facades.Database().Default().WithContext(c).First(dest, "`id`=?", id).Error
 }
 
-func assertPersonUnique(c context.Context, mobile, number, exclude string) error {
-	return assertPersonUniqueTx(facades.Database().Default().WithContext(c), mobile, number, exclude)
+func assertPersonUnique(c context.Context, mobile, idCard, number, exclude string) error {
+	return assertPersonUniqueTx(facades.Database().Default().WithContext(c), mobile, idCard, number, exclude)
 }
 
-func assertPersonUniqueTx(tx *gorm.DB, mobile, number, exclude string) error {
+func assertPersonUniqueTx(tx *gorm.DB, mobile, idCard, number, exclude string) error {
 	var total int64
 
-	q := tx.Model(&model.ShPerson{}).Where("`mobile`=?", mobile)
-	if exclude != "" {
-		q = q.Where("`id`<>?", exclude)
-	}
-	q.Count(&total)
-	if total > 0 {
-		return errors.New("手机号已存在")
+	if mobile != "" {
+		q := tx.Model(&model.ShPerson{}).Where("`mobile`=?", mobile)
+		if exclude != "" {
+			q = q.Where("`id`<>?", exclude)
+		}
+		q.Count(&total)
+		if total > 0 {
+			return errors.New("手机号已存在")
+		}
 	}
 
-	q = tx.Model(&model.ShPerson{}).Where("`number`=?", number)
+	if idCard != "" {
+		q := tx.Model(&model.ShPerson{}).Where("`id_card`=?", idCard)
+		if exclude != "" {
+			q = q.Where("`id`<>?", exclude)
+		}
+		q.Count(&total)
+		if total > 0 {
+			return errors.New("身份证号已存在")
+		}
+	}
+
+	q := tx.Model(&model.ShPerson{}).Where("`number`=?", number)
 	if exclude != "" {
 		q = q.Where("`id`<>?", exclude)
 	}
