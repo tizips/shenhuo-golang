@@ -2,6 +2,7 @@ package shenhuo
 
 import (
 	"context"
+	"time"
 
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/herhe-com/framework/facades"
@@ -22,7 +23,10 @@ func ToBannerOfList(c context.Context, ctx *app.RequestContext) {
 
 	var banners []model.ShBanner
 
-	facades.Database().Default().WithContext(c).Order("`order` asc, `id` asc").Find(&banners)
+	tx := facades.Database().Default().WithContext(c).Model(&model.ShBanner{})
+	tx.Where("(`started_at` is null or `started_at` <= ?)", time.Now())
+	tx.Where("(`ended_at` is null or `ended_at` >= ?)", time.Now())
+	tx.Order("`order` asc, `id` asc").Find(&banners)
 
 	responses := make([]res.ToBanner, len(banners))
 	for index, item := range banners {

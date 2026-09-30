@@ -6,6 +6,7 @@ require (
 	github.com/ArtisanCloud/PowerLibs/v3 v3.3.2
 	github.com/ArtisanCloud/PowerWeChat/v3 v3.4.45
 	github.com/cloudwego/hertz v0.10.6
+	github.com/dromara/carbon/v2 v2.6.17
 	github.com/go-playground/validator/v10 v10.30.3
 	github.com/go-redsync/redsync/v4 v4.17.0
 	github.com/golang-module/carbon/v2 v2.3.4
@@ -72,7 +73,6 @@ require (
 	github.com/cloudwego/runtimex v0.1.1 // indirect
 	github.com/cloudwego/thriftgo v0.4.5 // indirect
 	github.com/containerd/console v1.0.5 // indirect
-	github.com/dromara/carbon/v2 v2.6.17 // indirect
 	github.com/dromara/dongle v1.2.3 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect

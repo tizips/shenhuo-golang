@@ -2,8 +2,10 @@ package site
 
 import (
 	"context"
+	"errors"
 
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/dromara/carbon/v2"
 	"github.com/herhe-com/framework/contracts/http/response"
 	"github.com/herhe-com/framework/facades"
 	"github.com/herhe-com/framework/http"
@@ -57,6 +59,8 @@ func ToBannerOfPaginate(c context.Context, ctx *app.RequestContext) {
 				Image:     item.Image,
 				Link:      item.Link,
 				Order:     item.Order,
+				StartedAt: formatNullableDateTime(&item.StartedAt),
+				EndedAt:   formatNullableDateTime(&item.EndedAt),
 				CreatedAt: item.CreatedAt.ToDateTimeString(),
 			}
 		}
@@ -84,11 +88,19 @@ func DoBannerOfCreate(c context.Context, ctx *app.RequestContext) {
 		return
 	}
 
+	started, ended, err := parsePeriodOfBanner(request.StartedAt, request.EndedAt)
+	if err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
 	banner := model.ShBanner{
-		Title: request.Title,
-		Image: request.Image,
-		Link:  request.Link,
-		Order: helper.Order(request.Order),
+		Title:     request.Title,
+		Image:     request.Image,
+		Link:      request.Link,
+		Order:     helper.Order(request.Order),
+		StartedAt: started,
+		EndedAt:   ended,
 	}
 
 	if result := facades.Database().Default().WithContext(c).Create(&banner); result.Error != nil {
@@ -126,10 +138,18 @@ func DoBannerOfUpdate(c context.Context, ctx *app.RequestContext) {
 		return
 	}
 
+	started, ended, err := parsePeriodOfBanner(request.StartedAt, request.EndedAt)
+	if err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
 	banner.Title = request.Title
 	banner.Image = request.Image
 	banner.Link = request.Link
 	banner.Order = helper.Order(request.Order)
+	banner.StartedAt = started
+	banner.EndedAt = ended
 
 	if result := facades.Database().Default().WithContext(c).Save(&banner); result.Error != nil {
 		http.Fail(ctx, "修改失败：%v", result.Error)
@@ -171,4 +191,40 @@ func DoBannerOfDelete(c context.Context, ctx *app.RequestContext) {
 	}
 
 	http.Success[any](ctx)
+}
+
+// parsePeriodOfBanner 解析轮播有效期；开始/结束时间均为必填
+func parsePeriodOfBanner(started, ended string) (carbon.Carbon, carbon.Carbon, error) {
+
+	if started == "" {
+		return carbon.Carbon{}, carbon.Carbon{}, errors.New("生效开始时间不能为空")
+	}
+
+	if ended == "" {
+		return carbon.Carbon{}, carbon.Carbon{}, errors.New("生效结束时间不能为空")
+	}
+
+	start := carbon.Parse(started)
+	if start.Error != nil {
+		return carbon.Carbon{}, carbon.Carbon{}, errors.New("生效开始时间格式错误")
+	}
+
+	end := carbon.Parse(ended)
+	if end.Error != nil {
+		return carbon.Carbon{}, carbon.Carbon{}, errors.New("生效结束时间格式错误")
+	}
+
+	if end.Lt(start) {
+		return carbon.Carbon{}, carbon.Carbon{}, errors.New("生效结束时间不能早于生效开始时间")
+	}
+
+	return *start, *end, nil
+}
+
+// formatNullableDateTime 可空时间格式化为展示字符串；为空返回空串
+func formatNullableDateTime(value *carbon.Carbon) string {
+	if value == nil || value.IsNil() || value.IsInvalid() {
+		return ""
+	}
+	return value.ToDateTimeString()
 }
