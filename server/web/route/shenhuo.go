@@ -78,6 +78,7 @@ func ShenhuoRouter(router *server.Hertz) {
 	medias := router.Group("medias")
 	{
 		medias.GET("", shenhuo.ToMediaOfPaginate)
+		medias.GET(":id", shenhuo.ToMediaOfInformation)
 	}
 
 	system := router.Group("system")

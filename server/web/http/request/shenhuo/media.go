@@ -9,6 +9,11 @@ type ToMediaOfPaginate struct {
 	Type    string `json:"type" form:"type" validate:"omitempty,oneof=image video" label:"类型"` // 媒体类型；枚举：image=图片，video=视频
 }
 
+// ToMediaOfInformation 媒体详情查询请求
+type ToMediaOfInformation struct {
+	request.IDOfUint
+}
+
 // DoMediaOfCreateByImage 批量添加图片请求
 type DoMediaOfCreateByImage struct {
 	SceneID uint     `json:"scene_id" form:"scene_id" validate:"required,gt=0" label:"场景"`                             // 所属场景ID
@@ -17,7 +22,8 @@ type DoMediaOfCreateByImage struct {
 
 // DoMediaOfCreateByVideo 添加视频请求
 type DoMediaOfCreateByVideo struct {
-	SceneID uint   `json:"scene_id" form:"scene_id" validate:"required,gt=0" label:"场景"` // 所属场景ID
-	Title   string `json:"title" form:"title" validate:"required,max=128" label:"标题"`    // 视频标题
-	URL     string `json:"url" form:"url" validate:"required,max=255,url" label:"链接"`    // 视频资源地址
+	SceneID uint   `json:"scene_id" form:"scene_id" validate:"required,gt=0" label:"场景"`    // 所属场景ID
+	Title   string `json:"title" form:"title" validate:"required,max=128" label:"标题"`       // 视频标题
+	URL     string `json:"url" form:"url" validate:"required,max=255,url" label:"链接"`       // 视频资源地址
+	Cover   string `json:"cover" form:"cover" validate:"required,max=255,url" label:"视频封面"` // 视频封面地址
 }

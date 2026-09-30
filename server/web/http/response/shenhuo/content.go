@@ -137,6 +137,7 @@ type ToMedia struct {
 	Type    string `json:"type"`     // 媒体类型；枚举：image=图片，video=视频
 	Title   string `json:"title"`    // 媒体标题
 	URL     string `json:"url"`      // 媒体资源地址
+	Cover   string `json:"cover"`    // 视频封面地址；图片为空
 	IsTop   uint8  `json:"is_top"`   // 是否置顶；枚举：1=是，2=否
 }
 

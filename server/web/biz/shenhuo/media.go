@@ -2,6 +2,7 @@ package shenhuo
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -12,6 +13,7 @@ import (
 	"github.com/tizips/shenhuo/model"
 	req "github.com/tizips/shenhuo/server/web/http/request/shenhuo"
 	res "github.com/tizips/shenhuo/server/web/http/response/shenhuo"
+	"gorm.io/gorm"
 )
 
 // ToMediaOfPaginate
@@ -40,7 +42,7 @@ func ToMediaOfPaginate(c context.Context, ctx *app.RequestContext) {
 		Size: request.GetSize(),
 	}
 
-	tx := facades.Database().Default().WithContext(c).Model(&model.ShMedia{})
+	tx := facades.Database().Default().WithContext(c).Model(&model.ShMedia{}).Where("`is_enable`=?", global.YES)
 
 	if request.SceneID > 0 {
 		tx = tx.Where("`scene_id`=?", request.SceneID)
@@ -96,10 +98,11 @@ func DoMediaOfCreateByImage(c context.Context, ctx *app.RequestContext) {
 	medias := make([]model.ShMedia, len(request.URLs))
 	for index, url := range request.URLs {
 		medias[index] = model.ShMedia{
-			SceneID: request.SceneID,
-			Type:    model.ShMediaOfTypeImage,
-			URL:     url,
-			IsTop:   global.NO,
+			SceneID:  request.SceneID,
+			Type:     model.ShMediaOfTypeImage,
+			URL:      url,
+			IsTop:    global.NO,
+			IsEnable: global.YES,
 		}
 	}
 
@@ -148,11 +151,13 @@ func DoMediaOfCreateByVideo(c context.Context, ctx *app.RequestContext) {
 	}
 
 	media := model.ShMedia{
-		SceneID: request.SceneID,
-		Type:    model.ShMediaOfTypeVideo,
-		Title:   strings.TrimSpace(request.Title),
-		URL:     request.URL,
-		IsTop:   global.NO,
+		SceneID:  request.SceneID,
+		Type:     model.ShMediaOfTypeVideo,
+		Title:    strings.TrimSpace(request.Title),
+		URL:      request.URL,
+		Cover:    request.Cover,
+		IsTop:    global.NO,
+		IsEnable: global.YES,
 	}
 
 	if result := facades.Database().Default().WithContext(c).Create(&media); result.Error != nil {
@@ -175,7 +180,7 @@ func ToMediaOfPinned(c context.Context, ctx *app.RequestContext) {
 
 	var medias []model.ShMedia
 
-	facades.Database().Default().WithContext(c).Where("`is_top`=?", global.YES).Order("`id` desc").Find(&medias)
+	facades.Database().Default().WithContext(c).Where("`is_enable`=? and `is_top`=?", global.YES, global.YES).Order("`id` desc").Find(&medias)
 
 	responses := make([]res.ToMedia, len(medias))
 	for index, item := range medias {
@@ -185,6 +190,38 @@ func ToMediaOfPinned(c context.Context, ctx *app.RequestContext) {
 	http.Success(ctx, responses)
 }
 
+// ToMediaOfInformation
+// @Summary 获取媒体详情
+// @Description 获取指定精彩图片或视频详情
+// @Tags 媒体
+// @Accept json
+// @Produce json
+// @Param id path int true "媒体ID"
+// @Success 200 {object} res.ToMedia "媒体详情"
+// @Router /medias/{id} [get]
+func ToMediaOfInformation(c context.Context, ctx *app.RequestContext) {
+
+	var request req.ToMediaOfInformation
+
+	if err := ctx.BindAndValidate(&request); err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
+	var media model.ShMedia
+
+	fu := facades.Database().Default().First(&media, "`id`=? and `is_enable`=?", request.ID, global.YES)
+	if errors.Is(fu.Error, gorm.ErrRecordNotFound) {
+		http.NotFound(ctx, "未找到该数据")
+		return
+	} else if fu.Error != nil {
+		http.Fail(ctx, "查询失败：%v", fu.Error)
+		return
+	}
+
+	http.Success(ctx, mediaToResponse(media))
+}
+
 func mediaToResponse(item model.ShMedia) res.ToMedia {
 	return res.ToMedia{
 		ID:      item.ID,
@@ -192,6 +229,7 @@ func mediaToResponse(item model.ShMedia) res.ToMedia {
 		Type:    item.Type,
 		Title:   item.Title,
 		URL:     item.URL,
+		Cover:   item.Cover,
 		IsTop:   item.IsTop,
 	}
 }

@@ -13,7 +13,9 @@ type ShMedia struct {
 	Type      string         `gorm:"column:type"`
 	Title     string         `gorm:"column:title"`
 	URL       string         `gorm:"column:url"`
+	Cover     string         `gorm:"column:cover"`
 	IsTop     uint8          `gorm:"column:is_top"`
+	IsEnable  uint8          `gorm:"column:is_enable"`
 	CreatedAt carbon.Carbon  `gorm:"column:created_at;autoCreateTime" carbon:"type:dateTime"`
 	UpdatedAt carbon.Carbon  `gorm:"column:updated_at;autoUpdateTime" carbon:"type:dateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"column:deleted_at"`

@@ -95,10 +95,11 @@ func DoMediaOfCreateByImage(c context.Context, ctx *app.RequestContext) {
 	medias := make([]model.ShMedia, len(request.URLs))
 	for index, url := range request.URLs {
 		medias[index] = model.ShMedia{
-			SceneID: request.SceneID,
-			Type:    model.ShMediaOfTypeImage,
-			URL:     url,
-			IsTop:   request.IsTop,
+			SceneID:  request.SceneID,
+			Type:     model.ShMediaOfTypeImage,
+			URL:      url,
+			IsTop:    request.IsTop,
+			IsEnable: request.IsEnable,
 		}
 	}
 
@@ -140,11 +141,13 @@ func DoMediaOfCreateByVideo(c context.Context, ctx *app.RequestContext) {
 	}
 
 	media := model.ShMedia{
-		SceneID: request.SceneID,
-		Type:    model.ShMediaOfTypeVideo,
-		Title:   strings.TrimSpace(request.Title),
-		URL:     request.URL,
-		IsTop:   request.IsTop,
+		SceneID:  request.SceneID,
+		Type:     model.ShMediaOfTypeVideo,
+		Title:    strings.TrimSpace(request.Title),
+		URL:      request.URL,
+		Cover:    request.Cover,
+		IsTop:    request.IsTop,
+		IsEnable: request.IsEnable,
 	}
 
 	if result := facades.Database().Default().WithContext(c).Create(&media); result.Error != nil {
@@ -187,19 +190,96 @@ func DoMediaOfUpdate(c context.Context, ctx *app.RequestContext) {
 		return
 	}
 
-	if request.Type == model.ShMediaOfTypeVideo && strings.TrimSpace(request.Title) == "" {
-		http.Fail(ctx, "视频标题不能为空")
-		return
+	if request.Type == model.ShMediaOfTypeVideo {
+		if strings.TrimSpace(request.Title) == "" {
+			http.Fail(ctx, "视频标题不能为空")
+			return
+		}
+		if strings.TrimSpace(request.Cover) == "" {
+			http.Fail(ctx, "视频封面不能为空")
+			return
+		}
 	}
 
 	media.SceneID = request.SceneID
 	media.Type = request.Type
 	media.Title = strings.TrimSpace(request.Title)
 	media.URL = request.URL
+
+	if request.Type == model.ShMediaOfTypeVideo {
+		media.Cover = request.Cover
+	} else {
+		media.Cover = ""
+	}
+
 	media.IsTop = request.IsTop
+	media.IsEnable = request.IsEnable
 
 	if result := facades.Database().Default().WithContext(c).Save(&media); result.Error != nil {
 		http.Fail(ctx, "修改失败：%v", result.Error)
+		return
+	}
+
+	http.Success[any](ctx)
+}
+
+// ToMediaOfInformation
+// @Summary 获取媒体详情
+// @Description 获取指定媒体详情
+// @Tags 站点-媒体
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param id path int true "媒体ID"
+// @Success 200 {object} res.ToMediaOfInformation "媒体详情"
+// @Router /site/medias/{id} [get]
+func ToMediaOfInformation(c context.Context, ctx *app.RequestContext) {
+
+	var request req.ToMediaOfInformation
+
+	if err := ctx.BindAndValidate(&request); err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
+	var media model.ShMedia
+
+	if err := facades.Database().Default().WithContext(c).Preload("Scene").First(&media, request.ID).Error; err != nil {
+		writeFindError(ctx, err)
+		return
+	}
+
+	http.Success(ctx, mediaToResponse(media))
+}
+
+// DoMediaOfEnable
+// @Summary 启用/禁用媒体
+// @Description Permissions: site.media.enable
+// @Tags 站点-媒体
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body req.DoMediaOfEnable true "启用信息"
+// @Success 200 {object} nil "操作成功"
+// @Router /site/media/enable [put]
+func DoMediaOfEnable(c context.Context, ctx *app.RequestContext) {
+
+	var request req.DoMediaOfEnable
+
+	if err := ctx.BindAndValidate(&request); err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
+	var media model.ShMedia
+
+	if err := firstByID(c, &media, request.ID); err != nil {
+		writeFindError(ctx, err)
+		return
+	}
+
+	if result := facades.Database().Default().WithContext(c).Model(&media).Update("is_enable", request.IsEnable); result.Error != nil {
+		http.Fail(ctx, "启禁失败：%v", result.Error)
 		return
 	}
 
@@ -253,7 +333,9 @@ func mediaToResponse(item model.ShMedia) res.ToMediaOfPaginate {
 		Type:      item.Type,
 		Title:     item.Title,
 		URL:       item.URL,
+		Cover:     item.Cover,
 		IsTop:     item.IsTop,
+		IsEnable:  item.IsEnable,
 		CreatedAt: item.CreatedAt.ToDateTimeString(),
 	}
 
