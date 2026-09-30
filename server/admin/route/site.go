@@ -189,8 +189,8 @@ func SiteRouter(router *server.Hertz) {
 		medias := route.Group("medias")
 		{
 			medias.GET("", middleware.Permission("site.media.paginate"), site.ToMediaOfPaginate)
-			medias.PUT(":id", middleware.Permission("site.media.update"), site.DoMediaOfUpdate)
 			medias.GET(":id", site.ToMediaOfInformation)
+			medias.PUT(":id", middleware.Permission("site.media.update"), site.DoMediaOfUpdate)
 			medias.DELETE(":id", middleware.Permission("site.media.delete"), site.DoMediaOfDelete)
 		}
 
@@ -198,8 +198,8 @@ func SiteRouter(router *server.Hertz) {
 		{
 			media.POST("images", middleware.Permission("site.media.create"), site.DoMediaOfCreateByImage)
 			media.POST("video", middleware.Permission("site.media.create"), site.DoMediaOfCreateByVideo)
-		}
 			media.PUT("enable", middleware.Permission("site.media.enable"), site.DoMediaOfEnable)
+		}
 
 		managers := route.Group("managers")
 		{
