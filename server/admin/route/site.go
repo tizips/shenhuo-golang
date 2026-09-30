@@ -229,5 +229,11 @@ func SiteRouter(router *server.Hertz) {
 			score.POST("notify", middleware.Permission("site.score.notify"), site.DoScoreOfNotify)
 			score.GET("template", middleware.Permission("site.score.import"), site.ToScoreOfTemplate)
 		}
+
+		checkins := route.Group("checkins")
+		{
+			checkins.GET(":id", site.ToCheckinOfInformation)
+			checkins.GET("", middleware.Permission("site.checkin.paginate"), site.ToCheckinOfPaginate)
+		}
 	}
 }

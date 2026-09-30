@@ -102,6 +102,11 @@ func ShenhuoRouter(router *server.Hertz) {
 		score.GET("mine", middleware.Auth(), middle.Person(), shenhuo.ToScoreOfMine)
 	}
 
+	checkin := router.Group("checkin")
+	{
+		checkin.POST("", shenhuo.DoCheckinOfCreate)
+	}
+
 	draw := router.Group("draw").Use(middleware.Auth(), middle.Manager())
 	{
 		draw.POST("", shenhuo.DoDrawOfCreate)
