@@ -8,6 +8,7 @@ type ToArticleOfPaginate struct {
 	PublishedAt string `json:"published_at"` // 发布时间
 	IsTop       uint8  `json:"is_top"`       // 是否置顶；枚举：1=是，2=否
 	IsRecommend uint8  `json:"is_recommend"` // 是否首页推荐；枚举：1=是，2=否
+	IsEnable    uint8  `json:"is_enable"`    // 是否启用；枚举：1=是，2=否
 	CreatedAt   string `json:"created_at"`   // 创建时间
 }
 
@@ -20,5 +21,6 @@ type ToArticleOfInformation struct {
 	PublishedAt string `json:"published_at"` // 发布时间
 	IsTop       uint8  `json:"is_top"`       // 是否置顶；枚举：1=是，2=否
 	IsRecommend uint8  `json:"is_recommend"` // 是否首页推荐；枚举：1=是，2=否
+	IsEnable    uint8  `json:"is_enable"`    // 是否启用；枚举：1=是，2=否
 	CreatedAt   string `json:"created_at"`   // 创建时间
 }

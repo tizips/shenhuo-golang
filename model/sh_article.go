@@ -15,6 +15,7 @@ type ShArticle struct {
 	PublishedAt carbon.Carbon  `gorm:"column:published_at" carbon:"type:dateTime"`
 	IsTop       uint8          `gorm:"column:is_top"`
 	IsRecommend uint8          `gorm:"column:is_recommend"`
+	IsEnable    uint8          `gorm:"column:is_enable"`
 	CreatedAt   carbon.Carbon  `gorm:"column:created_at;autoCreateTime" carbon:"type:dateTime"`
 	UpdatedAt   carbon.Carbon  `gorm:"column:updated_at;autoUpdateTime" carbon:"type:dateTime"`
 	DeletedAt   gorm.DeletedAt `gorm:"column:deleted_at"`

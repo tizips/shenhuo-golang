@@ -16,6 +16,7 @@ type DoArticleOfCreate struct {
 	PublishedAt string `json:"published_at" form:"published_at" validate:"required,max=32" label:"发布时间"`    // 发布时间
 	IsTop       uint8  `json:"is_top" form:"is_top" validate:"required,oneof=1 2" label:"置顶"`               // 是否置顶；枚举：1=是，2=否
 	IsRecommend uint8  `json:"is_recommend" form:"is_recommend" validate:"required,oneof=1 2" label:"首页推荐"` // 是否首页推荐；枚举：1=是，2=否
+	IsEnable    uint8  `json:"is_enable" form:"is_enable" validate:"required,oneof=1 2" label:"是否启用"`       // 是否启用；枚举：1=是，2=否
 }
 
 // DoArticleOfUpdate 更新文章请求
@@ -27,6 +28,12 @@ type DoArticleOfUpdate struct {
 // DoArticleOfDelete 删除文章请求
 type DoArticleOfDelete struct {
 	request.IDOfUint
+}
+
+// DoArticleOfEnable 启用/停用文章请求
+type DoArticleOfEnable struct {
+	request.IDOfUint
+	request.Enable
 }
 
 // ToArticleOfInformation 文章详情查询请求

@@ -27,7 +27,7 @@ func ToArticleOfPinned(c context.Context, ctx *app.RequestContext) {
 
 	var articles []model.ShArticle
 
-	database().Where("`is_top`=?", global.YES).Order("`published_at` desc, `id` desc").Find(&articles)
+	database().Where("`is_enable`=? and `is_top`=?", global.YES, global.YES).Order("`published_at` desc, `id` desc").Find(&articles)
 
 	responses := make([]res.ToArticle, len(articles))
 	for index, item := range articles {
@@ -49,7 +49,7 @@ func ToArticleOfRecommend(c context.Context, ctx *app.RequestContext) {
 
 	var articles []model.ShArticle
 
-	database().Where("`is_recommend`=?", global.YES).Order("`published_at` desc, `id` desc").Find(&articles)
+	database().Where("`is_enable`=? and `is_recommend`=?", global.YES, global.YES).Order("`published_at` desc, `id` desc").Find(&articles)
 
 	responses := make([]res.ToArticle, len(articles))
 	for index, item := range articles {
@@ -83,7 +83,7 @@ func ToArticleOfPaginate(c context.Context, ctx *app.RequestContext) {
 		Size: request.GetSize(),
 	}
 
-	tx := database().Where("`is_top`=?", global.NO)
+	tx := database().Where("`is_enable`=? and `is_top`=?", global.YES, global.NO)
 
 	tx.Count(&responses.Total)
 
@@ -122,7 +122,7 @@ func ToArticleOfInformation(c context.Context, ctx *app.RequestContext) {
 
 	var article model.ShArticle
 
-	fu := database().First(&article, "`id`=?", request.ID)
+	fu := database().First(&article, "`id`=? and `is_enable`=?", request.ID, global.YES)
 	if errors.Is(fu.Error, gorm.ErrRecordNotFound) {
 		http.NotFound(ctx, "未找到该数据")
 		return

@@ -55,6 +55,7 @@ func SiteRouter(router *server.Hertz) {
 		article := route.Group("article")
 		{
 			article.POST("", middleware.Permission("site.article.create"), site.DoArticleOfCreate)
+			article.PUT("enable", middleware.Permission("site.article.enable"), site.DoArticleOfEnable)
 		}
 
 		pages := route.Group("pages")

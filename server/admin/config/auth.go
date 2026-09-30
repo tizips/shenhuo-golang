@@ -84,7 +84,7 @@ func site() contractauth.Permission {
 					},
 				},
 			},
-			crud("article", "热点资讯"),
+			crud("article", "热点资讯", action("enable", "启禁")),
 			crud("page", "页面"),
 			crud("page_builtin", "内置页面"),
 			crud("nav", "导航"),

@@ -65,6 +65,7 @@ func ToArticleOfPaginate(c context.Context, ctx *app.RequestContext) {
 				PublishedAt: item.PublishedAt.ToDateTimeString(),
 				IsTop:       item.IsTop,
 				IsRecommend: item.IsRecommend,
+				IsEnable:    item.IsEnable,
 				CreatedAt:   item.CreatedAt.ToDateTimeString(),
 			}
 		}
@@ -107,6 +108,7 @@ func ToArticleOfInformation(c context.Context, ctx *app.RequestContext) {
 		PublishedAt: article.PublishedAt.ToDateTimeString(),
 		IsTop:       article.IsTop,
 		IsRecommend: article.IsRecommend,
+		IsEnable:    article.IsEnable,
 		CreatedAt:   article.CreatedAt.ToDateTimeString(),
 	})
 }
@@ -143,6 +145,7 @@ func DoArticleOfCreate(c context.Context, ctx *app.RequestContext) {
 		PublishedAt: published,
 		IsTop:       request.IsTop,
 		IsRecommend: request.IsRecommend,
+		IsEnable:    request.IsEnable,
 	}
 
 	if result := facades.Database().Default().WithContext(c).Create(&article); result.Error != nil {
@@ -192,9 +195,44 @@ func DoArticleOfUpdate(c context.Context, ctx *app.RequestContext) {
 	article.PublishedAt = published
 	article.IsTop = request.IsTop
 	article.IsRecommend = request.IsRecommend
+	article.IsEnable = request.IsEnable
 
 	if result := facades.Database().Default().WithContext(c).Save(&article); result.Error != nil {
 		http.Fail(ctx, "修改失败：%v", result.Error)
+		return
+	}
+
+	http.Success[any](ctx)
+}
+
+// DoArticleOfEnable
+// @Summary 启用/禁用资讯
+// @Description Permissions: site.article.enable
+// @Tags 站点-资讯
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body req.DoArticleOfEnable true "启用信息"
+// @Success 200 {object} nil "操作成功"
+// @Router /site/article/enable [put]
+func DoArticleOfEnable(c context.Context, ctx *app.RequestContext) {
+
+	var request req.DoArticleOfEnable
+
+	if err := ctx.BindAndValidate(&request); err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
+	var article model.ShArticle
+
+	if err := firstByID(c, &article, request.ID); err != nil {
+		writeFindError(ctx, err)
+		return
+	}
+
+	if result := facades.Database().Default().WithContext(c).Model(&article).Update("is_enable", request.IsEnable); result.Error != nil {
+		http.Fail(ctx, "启禁失败：%v", result.Error)
 		return
 	}
 
