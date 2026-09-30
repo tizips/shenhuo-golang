@@ -113,6 +113,13 @@ func site() contractauth.Permission {
 					action("paginate", "列表"),
 				},
 			},
+			{
+				Code: "appeal",
+				Name: "仲裁申诉",
+				Children: []contractauth.Permission{
+					action("paginate", "列表"),
+				},
+			},
 		},
 	}
 }

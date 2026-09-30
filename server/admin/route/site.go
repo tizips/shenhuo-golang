@@ -235,5 +235,11 @@ func SiteRouter(router *server.Hertz) {
 			checkins.GET(":id", site.ToCheckinOfInformation)
 			checkins.GET("", middleware.Permission("site.checkin.paginate"), site.ToCheckinOfPaginate)
 		}
+
+		appeals := route.Group("appeals")
+		{
+			appeals.GET(":id", site.ToAppealOfInformation)
+			appeals.GET("", middleware.Permission("site.appeal.paginate"), site.ToAppealOfPaginate)
+		}
 	}
 }

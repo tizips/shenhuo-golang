@@ -107,6 +107,11 @@ func ShenhuoRouter(router *server.Hertz) {
 		checkin.POST("", shenhuo.DoCheckinOfCreate)
 	}
 
+	appeal := router.Group("appeal")
+	{
+		appeal.POST("", shenhuo.DoAppealOfCreate)
+	}
+
 	draw := router.Group("draw").Use(middleware.Auth(), middle.Manager())
 	{
 		draw.POST("", shenhuo.DoDrawOfCreate)
