@@ -1,7 +1,8 @@
 package site
 
-// ToDrawOfPaginate 抽签结果分页项响应
-type ToDrawOfPaginate struct {
+// ToDrawOfList 抽签结果项响应
+type ToDrawOfList struct {
+	Sequence   int    `json:"sequence"`    // 序号；按 id 正序实时生成，不入库
 	ID         uint   `json:"id"`          // 抽签结果ID
 	CategoryID uint   `json:"category_id"` // 抽签类别ID
 	Category   string `json:"category"`    // 抽签类别名称
@@ -15,5 +16,5 @@ type ToDrawOfPaginate struct {
 
 // DoDrawOfCreate 登记抽签结果响应
 type DoDrawOfCreate struct {
-	ToDrawOfPaginate
+	ToDrawOfList
 }

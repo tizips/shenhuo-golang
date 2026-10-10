@@ -164,7 +164,8 @@ func SiteRouter(router *server.Hertz) {
 
 		draws := route.Group("draws")
 		{
-			draws.GET("", middleware.Permission("site.draw.paginate"), site.ToDrawOfPaginate)
+			draws.GET("", middleware.Permission("site.draw.paginate"), site.ToDrawOfList)
+			draws.GET("export", middleware.Permission("site.draw.paginate"), site.ToDrawOfExport)
 			draws.DELETE(":id", middleware.Permission("site.draw.delete"), site.DoDrawOfDelete)
 		}
 

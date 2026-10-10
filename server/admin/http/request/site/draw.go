@@ -2,10 +2,9 @@ package site
 
 import "github.com/herhe-com/framework/contracts/http/request"
 
-// ToDrawOfPaginate 抽签结果分页查询请求
-type ToDrawOfPaginate struct {
-	CategoryID uint `json:"category_id" form:"category_id" query:"category_id" validate:"omitempty,gt=0" label:"抽签类别"` // 抽签类别ID；留空表示查全部类别
-	request.Paginate
+// ToDrawOfList 抽签结果查询请求
+type ToDrawOfList struct {
+	CategoryID uint `json:"category_id" form:"category_id" query:"category_id" validate:"required,gt=0" label:"抽签类别"` // 抽签类别ID
 }
 
 // DoDrawOfCreate 登记抽签结果请求
