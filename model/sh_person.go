@@ -15,12 +15,15 @@ type ShPerson struct {
 	IDCard             string         `gorm:"column:id_card"`
 	Password           string         `gorm:"column:password"`
 	Number             string         `gorm:"column:number"`
-	GroupName          string         `gorm:"column:group_name"`
+	GroupName          string         `gorm:"column:group_name"`  // 所属小组名称
+	CategoryID         uint           `gorm:"column:category_id"` // 抽签组别；所属抽签类别
 	OpenID             string         `gorm:"column:openid"`
 	MustChangePassword uint8          `gorm:"column:must_change_password"`
 	CreatedAt          carbon.Carbon  `gorm:"column:created_at;autoCreateTime" carbon:"type:dateTime"`
 	UpdatedAt          carbon.Carbon  `gorm:"column:updated_at;autoUpdateTime" carbon:"type:dateTime"`
 	DeletedAt          gorm.DeletedAt `gorm:"column:deleted_at"`
+
+	Category *ShDrawCategory `gorm:"foreignKey:CategoryID;references:ID"`
 }
 
 func (ShPerson) TableName() string {

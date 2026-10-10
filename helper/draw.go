@@ -54,7 +54,8 @@ func DrawCategory(tx *gorm.DB, categoryID uint) ([]model.ShDraw, error) {
 		return nil, err
 	}
 
-	query := tx.Model(&model.ShPerson{}).Select("id")
+	// 仅从当前抽签组别（抽签类别）绑定的人员名单中抽取
+	query := tx.Model(&model.ShPerson{}).Select("id").Where("`category_id`=?", category.ID)
 	if len(drawnIDs) > 0 {
 		query = query.Where("`id` NOT IN ?", drawnIDs)
 	}
@@ -81,7 +82,7 @@ func DrawCategory(tx *gorm.DB, categoryID uint) ([]model.ShDraw, error) {
 		return nil, err
 	}
 
-	if err := tx.Preload("Person").Preload("Category").Where("`id` IN ?", drawIDs(draws)).Find(&draws).Error; err != nil {
+	if err := tx.Preload("Person").Preload("Person.Category").Preload("Category").Where("`id` IN ?", drawIDs(draws)).Find(&draws).Error; err != nil {
 		return nil, err
 	}
 

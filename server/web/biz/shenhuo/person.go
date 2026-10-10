@@ -15,16 +15,28 @@ import (
 
 // ToPersonOfList
 // @Summary 获取人员列表
-// @Description 获取人员列表；不分页
+// @Description 获取指定抽签组别下的人员列表；不分页，仅返回绑定到该抽签类别的人员
 // @Tags 人员
 // @Produce json
+// @Param category_id query int true "抽签组别（抽签类别ID）"
 // @Success 200 {array} res.ToPerson "人员列表"
 // @Router /persons [get]
 func ToPersonOfList(c context.Context, ctx *app.RequestContext) {
 
+	var request req.ToPersonOfList
+
+	if err := ctx.BindAndValidate(&request); err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
 	var people []model.ShPerson
 
-	facades.Database().Default().WithContext(c).Select("`name`", "`unit`").Order("`name` asc, `id` asc").Find(&people)
+	facades.Database().Default().WithContext(c).
+		Select("`name`", "`unit`").
+		Where("`category_id`=?", request.CategoryID).
+		Order("`name` asc, `id` asc").
+		Find(&people)
 
 	responses := make([]res.ToPerson, len(people))
 	for index, item := range people {
@@ -56,7 +68,7 @@ func ToPersonOfGroupList(c context.Context, ctx *app.RequestContext) {
 
 	var counts []countOfCategory
 	facades.Database().Default().WithContext(c).
-		Model(&model.ShDraw{}).
+		Model(&model.ShPerson{}).
 		Select("`category_id`, COUNT(*) AS `total`").
 		Group("`category_id`").
 		Scan(&counts)
@@ -81,8 +93,8 @@ func ToPersonOfGroupList(c context.Context, ctx *app.RequestContext) {
 }
 
 // ToPersonOfGroupInformation
-// @Summary 获取单个分组的人员列表
-// @Description 按照抽签分组获取单个分组的参赛人员列表；不分页
+// @Summary 获取单个分组的中签人员列表
+// @Description 按照抽签分组获取单个分组的中签人员列表；按抽签先后顺序（抽签结果落库顺序）返回；不分页
 // @Tags 人员
 // @Produce json
 // @Param id path int true "分组ID（抽签类别ID）"
@@ -109,7 +121,11 @@ func ToPersonOfGroupInformation(c context.Context, ctx *app.RequestContext) {
 	}
 
 	var draws []model.ShDraw
-	facades.Database().Default().WithContext(c).Preload("Person").Where("`category_id`=?", request.ID).Find(&draws)
+	facades.Database().Default().WithContext(c).
+		Preload("Person").
+		Where("`category_id`=?", request.ID).
+		Order("`id` asc").
+		Find(&draws)
 
 	persons := make([]res.ToGroupedPerson, 0, len(draws))
 	for _, draw := range draws {

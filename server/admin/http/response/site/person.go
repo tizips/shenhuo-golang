@@ -8,6 +8,8 @@ type ToPersonOfPaginate struct {
 	Mobile             string `json:"mobile"`               // 手机号
 	IDCard             string `json:"id_card"`              // 身份证号
 	Number             string `json:"number"`               // 参赛号
+	CategoryID         uint   `json:"category_id"`          // 抽签组别；所属抽签类别ID
+	Category           string `json:"category"`             // 抽签组别名称
 	GroupName          string `json:"group_name"`           // 所属小组名称
 	MustChangePassword uint8  `json:"must_change_password"` // 是否需强制修改密码；枚举：1=是，2=否
 	CreatedAt          string `json:"created_at"`           // 创建时间

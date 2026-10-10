@@ -17,6 +17,8 @@ type DoPersonOfCreate struct {
 	Password  string `json:"password" form:"password" validate:"required,password" label:"密码"`     // 登录密码
 	Number    string `json:"number" form:"number" validate:"required,max=32" label:"参赛号"`          // 参赛号
 	GroupName string `json:"group_name" form:"group_name" validate:"required,max=64" label:"小组名称"` // 所属小组名称
+	// 抽签组别；所属抽签类别
+	CategoryID uint `json:"category_id" form:"category_id" validate:"required,gt=0" label:"抽签组别"`
 }
 
 // DoPersonOfUpdate 更新参赛人员请求
@@ -28,6 +30,8 @@ type DoPersonOfUpdate struct {
 	Password  string `json:"password" form:"password" validate:"omitempty,password" label:"密码"`    // 新密码；留空表示不修改
 	Number    string `json:"number" form:"number" validate:"required,max=32" label:"参赛号"`          // 参赛号
 	GroupName string `json:"group_name" form:"group_name" validate:"required,max=64" label:"小组名称"` // 所属小组名称
+	// 抽签组别；所属抽签类别
+	CategoryID uint `json:"category_id" form:"category_id" validate:"required,gt=0" label:"抽签组别"`
 	request.IDOfSnowflake
 }
 

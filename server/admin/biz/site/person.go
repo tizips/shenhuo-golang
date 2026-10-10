@@ -60,7 +60,7 @@ func ToPersonOfPaginate(c context.Context, ctx *app.RequestContext) {
 
 		var people []model.ShPerson
 
-		tx.Order("`id` desc").Offset(request.GetOffset()).Limit(request.GetLimit()).Find(&people)
+		tx.Preload("Category").Order("`id` desc").Offset(request.GetOffset()).Limit(request.GetLimit()).Find(&people)
 
 		responses.Data = make([]res.ToPersonOfPaginate, len(people))
 
@@ -152,6 +152,11 @@ func DoPersonOfCreate(c context.Context, ctx *app.RequestContext) {
 		return
 	}
 
+	if err := assertCategoryExists(c, request.CategoryID); err != nil {
+		http.Fail(ctx, "%s", err.Error())
+		return
+	}
+
 	person := model.ShPerson{
 		ID:                 facades.Snowflake().Generate().String(),
 		Name:               request.Name,
@@ -161,6 +166,7 @@ func DoPersonOfCreate(c context.Context, ctx *app.RequestContext) {
 		Password:           auth.Password(request.Password),
 		Number:             request.Number,
 		GroupName:          request.GroupName,
+		CategoryID:         request.CategoryID,
 		MustChangePassword: global.NO,
 	}
 
@@ -204,12 +210,18 @@ func DoPersonOfUpdate(c context.Context, ctx *app.RequestContext) {
 		return
 	}
 
+	if err := assertCategoryExists(c, request.CategoryID); err != nil {
+		http.Fail(ctx, "%s", err.Error())
+		return
+	}
+
 	person.Name = request.Name
 	person.Unit = request.Unit
 	person.Mobile = request.Mobile
 	person.IDCard = request.IDCard
 	person.Number = request.Number
 	person.GroupName = request.GroupName
+	person.CategoryID = request.CategoryID
 
 	if request.Password != "" {
 		person.Password = auth.Password(request.Password)
@@ -301,6 +313,19 @@ func DoPersonOfImport(c context.Context, ctx *app.RequestContext) {
 	now := time.Now()
 	responses := res.DoPersonOfImport{Total: len(rows) - 1}
 
+	var categories []model.ShDrawCategory
+	if err = facades.Database().Default().WithContext(c).Find(&categories).Error; err != nil {
+		http.Fail(ctx, "导入失败：%v", err)
+		return
+	}
+
+	categoryIDs := make(map[string]uint, len(categories))
+	for _, category := range categories {
+		if category.Name != "" {
+			categoryIDs[category.Name] = category.ID
+		}
+	}
+
 	tx := facades.Database().Default().WithContext(c).Begin()
 
 	for _, row := range rows[1:] {
@@ -310,8 +335,9 @@ func DoPersonOfImport(c context.Context, ctx *app.RequestContext) {
 		idCard := helper.CellByName(row, headers, "身份证号", "身份证")
 		number := helper.CellByName(row, headers, "参赛号", "编号")
 		group := helper.CellByName(row, headers, "小组名称", "小组")
+		drawCategory := helper.CellByName(row, headers, "抽签组别", "抽签类别", "组别")
 
-		if name == "" && unit == "" && mobile == "" && idCard == "" && number == "" && group == "" {
+		if name == "" && unit == "" && mobile == "" && idCard == "" && number == "" && group == "" && drawCategory == "" {
 			responses.Skipped++
 			continue
 		}
@@ -325,6 +351,14 @@ func DoPersonOfImport(c context.Context, ctx *app.RequestContext) {
 		if idCard != "" && !regexp.MustCompile(`^\d{17}[\dX]$`).MatchString(strings.ToUpper(idCard)) {
 			tx.Rollback()
 			http.Fail(ctx, "导入失败：存在无效的身份证号")
+			return
+		}
+
+		// 抽签组别；按抽签类别名称匹配
+		categoryID, ok := categoryIDs[drawCategory]
+		if !ok {
+			tx.Rollback()
+			http.Fail(ctx, "导入失败：存在无法匹配的抽签组别「%s」", drawCategory)
 			return
 		}
 
@@ -350,6 +384,7 @@ func DoPersonOfImport(c context.Context, ctx *app.RequestContext) {
 			Password:           auth.Password(helper.PersonImportPassword(passwordOf, now)),
 			Number:             number,
 			GroupName:          group,
+			CategoryID:         categoryID,
 			MustChangePassword: global.YES,
 		}
 
@@ -368,6 +403,11 @@ func DoPersonOfImport(c context.Context, ctx *app.RequestContext) {
 }
 
 func personToPaginate(item model.ShPerson) res.ToPersonOfPaginate {
+	category := ""
+	if item.Category != nil {
+		category = item.Category.Name
+	}
+
 	return res.ToPersonOfPaginate{
 		ID:                 item.ID,
 		Name:               item.Name,
@@ -376,6 +416,8 @@ func personToPaginate(item model.ShPerson) res.ToPersonOfPaginate {
 		IDCard:             item.IDCard,
 		Number:             item.Number,
 		GroupName:          item.GroupName,
+		CategoryID:         item.CategoryID,
+		Category:           category,
 		MustChangePassword: item.MustChangePassword,
 		CreatedAt:          item.CreatedAt.ToDateTimeString(),
 	}
@@ -383,6 +425,19 @@ func personToPaginate(item model.ShPerson) res.ToPersonOfPaginate {
 
 func firstBySID(c context.Context, dest any, id string) error {
 	return facades.Database().Default().WithContext(c).First(dest, "`id`=?", id).Error
+}
+
+func assertCategoryExists(c context.Context, id uint) error {
+	var total int64
+
+	if err := facades.Database().Default().WithContext(c).Model(&model.ShDrawCategory{}).Where("`id`=?", id).Count(&total).Error; err != nil {
+		return err
+	}
+	if total == 0 {
+		return errors.New("抽签类别不存在")
+	}
+
+	return nil
 }
 
 func assertPersonUnique(c context.Context, mobile, idCard, number, exclude string) error {

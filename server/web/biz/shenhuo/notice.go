@@ -81,11 +81,12 @@ func sendTestNotice(c context.Context, kind string, person *model.ShPerson) erro
 
 	case "draw":
 		group := person.GroupName
-		var draw model.ShDraw
-		fd := facades.Database().Default().WithContext(c).Preload("Category").
-			Order("`id` desc").First(&draw, "`person_id`=?", person.ID)
-		if fd.Error == nil && draw.Category != nil && draw.Category.Name != "" {
-			group = draw.Category.Name
+		if group == "" && person.CategoryID > 0 {
+			var category model.ShDrawCategory
+			fc := facades.Database().Default().WithContext(c).First(&category, "`id`=?", person.CategoryID)
+			if fc.Error == nil {
+				group = category.Name
+			}
 		}
 		return wechat.SendDrawNotice(c, person.OpenID, person.Name, person.Unit, group)
 	}

@@ -50,8 +50,9 @@ func ToScoreOfPaginate(c context.Context, ctx *app.RequestContext) {
 		tx = tx.Where("exists (?)", facades.Database().Default().WithContext(c).
 			Model(&model.ShPerson{}).
 			Select("1").
+			Joins("LEFT JOIN `"+model.TableShDrawCategory+"` ON `"+model.TableShDrawCategory+"`.`id` = `"+model.TableShPerson+"`.`category_id`").
 			Where(model.TableShPerson+".id="+model.TableShScore+".person_id").
-			Where("`name` LIKE ? OR `number` LIKE ? OR `mobile` LIKE ? OR `group_name` LIKE ?", like, like, like, like),
+			Where("`"+model.TableShPerson+"`.`name` LIKE ? OR `number` LIKE ? OR `mobile` LIKE ? OR `"+model.TableShDrawCategory+"`.`group_name` LIKE ? OR `"+model.TableShDrawCategory+"`.`name` LIKE ?", like, like, like, like, like),
 		)
 	}
 
