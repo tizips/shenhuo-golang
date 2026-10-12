@@ -92,7 +92,7 @@ func site() contractauth.Permission {
 			crud("schedule", "日期安排"),
 			crud("schedule_category", "日程分类"),
 			crud("person", "人员", action("import", "导入")),
-			crud("draw_category", "抽签类别"),
+			crud("draw_category", "抽签类别", action("truncate", "清空结果")),
 			{
 				Code: "draw",
 				Name: "人员抽签",

@@ -216,3 +216,42 @@ func DoDrawCategoryOfDelete(c context.Context, ctx *app.RequestContext) {
 
 	http.Success[any](ctx)
 }
+
+// DoDrawCategoryOfTruncate
+// @Summary 清空抽签结果
+// @Description Permissions: site.draw_category.truncate
+// @Tags 站点-抽签
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Param request body req.DoDrawCategoryOfTruncate true "抽签类别ID"
+// @Success 200 {object} nil "清空成功"
+// @Router /site/draw-category/truncate [post]
+func DoDrawCategoryOfTruncate(c context.Context, ctx *app.RequestContext) {
+
+	var request req.DoDrawCategoryOfTruncate
+
+	if err := ctx.BindAndValidate(&request); err != nil {
+		http.BadRequest(ctx, err)
+		return
+	}
+
+	var item model.ShDrawCategory
+
+	if err := firstByID(c, &item, request.ID); err != nil {
+		writeFindError(ctx, err)
+		return
+	}
+
+	tx := facades.Database().Default().WithContext(c).Begin()
+
+	if result := tx.Where("`category_id`=?", item.ID).Delete(&model.ShDraw{}); result.Error != nil {
+		tx.Rollback()
+		http.Fail(ctx, "清空失败：%v", result.Error)
+		return
+	}
+
+	tx.Commit()
+
+	http.Success[any](ctx)
+}

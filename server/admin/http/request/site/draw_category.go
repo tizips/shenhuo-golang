@@ -25,3 +25,8 @@ type DoDrawCategoryOfUpdate struct {
 type DoDrawCategoryOfDelete struct {
 	request.IDOfUint
 }
+
+// DoDrawCategoryOfTruncate 清空抽签结果请求
+type DoDrawCategoryOfTruncate struct {
+	request.IDOfUint
+}

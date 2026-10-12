@@ -159,6 +159,7 @@ func SiteRouter(router *server.Hertz) {
 		drawCategory := route.Group("draw-category")
 		{
 			drawCategory.POST("", middleware.Permission("site.draw_category.create"), site.DoDrawCategoryOfCreate)
+			drawCategory.POST("truncate", middleware.Permission("site.draw_category.truncate"), site.DoDrawCategoryOfTruncate)
 			drawCategory.GET("opening", site.ToDrawCategoryOfOpening)
 		}
 
