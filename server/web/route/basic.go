@@ -25,6 +25,11 @@ func BasicRouter(router *server.Hertz) {
 			account.PUT("password", middle.Person(), basic.DoAccountOfPassword)
 		}
 
+		manager := route.Group("manager")
+		{
+			manager.GET("information", basic.ToManagerOfInformation)
+		}
+
 		upload := route.Group("upload").Use(middleware.Auth(), middle.Manager())
 		{
 			upload.POST("file", basic.DoUploadOfFile)

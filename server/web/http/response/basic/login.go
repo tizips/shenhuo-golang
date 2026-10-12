@@ -1,5 +1,14 @@
 package basic
 
+// ToManagerOfInformation 管理人员信息响应
+// 用于前端判断当前用户是否为已登录的管理人员；未登录时仅返回 logged_in=false。
+type ToManagerOfInformation struct {
+	LoggedIn bool   `json:"logged_in"`        // 是否为已登录的管理人员
+	ID       string `json:"id,omitempty"`     // 账号ID；已登录时返回
+	Name     string `json:"name,omitempty"`   // 姓名；已登录时返回
+	Mobile   string `json:"mobile,omitempty"` // 手机号；已登录时返回
+}
+
 // DoLogin 登录响应
 // 双令牌（JWT）机制：
 //   - access_token 用于日常请求；过期后（接口返回 401）改用 refresh_token 换取新令牌对；

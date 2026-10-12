@@ -215,6 +215,34 @@ func ToAccountOfInformation(c context.Context, ctx *app.RequestContext) {
 	})
 }
 
+// ToManagerOfInformation
+// @Summary 获取管理人员信息
+// @Description 判断当前用户是否为已登录的管理人员：已登录且账号启用时返回管理人员信息，否则仅返回 logged_in=false，不报未授权错误
+// @Tags 基础-账户
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} res.ToManagerOfInformation "管理人员信息"
+// @Router /basic/manager/information [get]
+func ToManagerOfInformation(c context.Context, ctx *app.RequestContext) {
+
+	response := res.ToManagerOfInformation{}
+
+	if auth.Check(ctx) && jwtKind(ctx) == constants.JwtKindManager {
+
+		var manager model.ShManager
+		err := facades.Database().Default().WithContext(c).
+			First(&manager, "`id`=? and `is_enable`=?", auth.ID(ctx), global.YES).Error
+		if err == nil {
+			response.LoggedIn = true
+			response.ID = manager.ID
+			response.Name = manager.Name
+			response.Mobile = manager.Mobile
+		}
+	}
+
+	http.Success(ctx, response)
+}
+
 // DoAccountOfPassword
 // @Summary 修改密码
 // @Description 参赛人员修改密码
