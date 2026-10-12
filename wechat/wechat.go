@@ -207,14 +207,16 @@ func OpenIDOfCode(c context.Context, code string) (string, error) {
 	return openID, nil
 }
 
-// template 模板消息配置：模板ID、消息打开链接与关键词变量名。
+// template 模板消息配置：推送开关、模板ID、消息打开链接与关键词变量名。
 type template struct {
-	ID   string
-	URL  string
-	Keys map[string]string
+	Enable bool
+	ID     string
+	URL    string
+	Keys   map[string]string
 }
 
-// templateOf 读取模板配置；keys 缺省时使用微信模板实际变量名。
+// templateOf 读取模板配置；keys 缺省时使用微信模板实际变量名；
+// enable 为 false 时关闭该模板的推送，返回错误，由调用方决定如何提示。
 func templateOf(name string) (template, error) {
 
 	prefix := "wechat.templates." + name
@@ -227,13 +229,18 @@ func templateOf(name string) (template, error) {
 	}
 
 	tpl := template{
-		ID:  facades.Config().GetString(prefix+".id", ""),
-		URL: facades.Config().GetString(prefix+".url", ""),
+		Enable: facades.Config().GetBool(prefix+".enable", true),
+		ID:     facades.Config().GetString(prefix+".id", ""),
+		URL:    facades.Config().GetString(prefix+".url", ""),
 		Keys: map[string]string{
 			"name":   pick(prefix+".keys.name", "thing2"),
 			"number": pick(prefix+".keys.number", "character_string3"),
 			"unit":   pick(prefix+".keys.unit", "thing3"),
 		},
+	}
+
+	if !tpl.Enable {
+		return tpl, fmt.Errorf("微信推送未开启（%s.enable=false）", prefix)
 	}
 
 	if tpl.ID == "" {
@@ -321,6 +328,7 @@ func withQuery(link string, params map[string]string) string {
 }
 
 // send 发送模板消息；link 非空时点击消息将跳转到该链接。
+// 每个模板的推送开关在模板配置（wechat.templates.<name>.enable）中控制，见 templateOf。
 func send(c context.Context, openID, templateID, link string, data *power.HashMap) error {
 
 	oa, err := app()

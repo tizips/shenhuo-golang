@@ -18,16 +18,18 @@ func init() {
 		},
 		"templates": map[string]any{
 			"score": map[string]any{
-				"id":  cfg.Env("wechat.templates.score.id", ""),
-				"url": cfg.Env("wechat.templates.score.url", ""),
+				"enable": cfg.Env("wechat.templates.score.enable", true),
+				"id":     cfg.Env("wechat.templates.score.id", ""),
+				"url":    cfg.Env("wechat.templates.score.url", ""),
 				"keys": map[string]any{
 					"name":   cfg.Env("wechat.templates.score.keys.name", ""),
 					"number": cfg.Env("wechat.templates.score.keys.number", ""),
 				},
 			},
 			"draw": map[string]any{
-				"id":  cfg.Env("wechat.templates.draw.id", ""),
-				"url": cfg.Env("wechat.templates.draw.url", ""),
+				"enable": cfg.Env("wechat.templates.draw.enable", true),
+				"id":     cfg.Env("wechat.templates.draw.id", ""),
+				"url":    cfg.Env("wechat.templates.draw.url", ""),
 				"keys": map[string]any{
 					"name": cfg.Env("wechat.templates.draw.keys.name", ""),
 					"unit": cfg.Env("wechat.templates.draw.keys.unit", ""),
